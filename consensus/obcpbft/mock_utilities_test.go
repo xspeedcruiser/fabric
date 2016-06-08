@@ -22,11 +22,26 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric/consensus/obcpbft/events"
 	"github.com/hyperledger/fabric/core/ledger/statemgmt"
 
 	pb "github.com/hyperledger/fabric/protos"
+	"github.com/spf13/viper"
 	gp "google/protobuf"
 )
+
+type inertTimer struct{}
+
+func (it *inertTimer) Halt()                                                {}
+func (it *inertTimer) Reset(duration time.Duration, event events.Event)     {}
+func (it *inertTimer) SoftReset(duration time.Duration, event events.Event) {}
+func (it *inertTimer) Stop()                                                {}
+
+type inertTimerFactory struct{}
+
+func (it *inertTimerFactory) CreateTimer() events.Timer {
+	return &inertTimer{}
+}
 
 type noopSecurity struct{}
 
@@ -80,6 +95,14 @@ func (p *mockPersist) DelState(key string) {
 	delete(p.store, key)
 }
 
+func createRunningPbftWithManager(id uint64, config *viper.Viper, stack innerStack) (*pbftCore, events.Manager) {
+	manager := events.NewManagerImpl()
+	core := newPbftCore(id, loadConfig(), stack, events.NewTimerFactoryImpl(manager))
+	manager.SetReceiver(core)
+	manager.Start()
+	return core, manager
+}
+
 // Create a message of type `Message_CHAIN_TRANSACTION`
 func createOcMsgWithChainTx(iter int64) (msg *pb.Message) {
 	txTime := &gp.Timestamp{Seconds: iter, Nanos: 0}
@@ -91,6 +114,23 @@ func createOcMsgWithChainTx(iter int64) (msg *pb.Message) {
 	msg = &pb.Message{
 		Type:    pb.Message_CHAIN_TRANSACTION,
 		Payload: txPacked,
+	}
+	return
+}
+
+// Create a message of type `Message_CHAIN_TRANSACTION`
+func createPbftRequestWithChainTx(iter int64, replica uint64) (msg *Request) {
+	txTime := &gp.Timestamp{Seconds: iter, Nanos: 0}
+	tx := &pb.Transaction{Type: pb.Transaction_CHAINCODE_DEPLOY,
+		Timestamp: txTime,
+		Payload:   []byte(fmt.Sprint(iter)),
+	}
+	txPacked, _ := proto.Marshal(tx)
+
+	msg = &Request{
+		Timestamp: txTime,
+		ReplicaId: replica,
+		Payload:   txPacked,
 	}
 	return
 }
@@ -134,18 +174,22 @@ type omniProto struct {
 	ReadStateSetImpl           func(prefix string) (map[string][]byte, error)
 	StoreStateImpl             func(key string, value []byte) error
 	DelStateImpl               func(key string)
+	ValidateStateImpl          func()
+	InvalidateStateImpl        func()
 
 	// Inner Stack methods
-	broadcastImpl    func(msgPayload []byte)
-	unicastImpl      func(msgPayload []byte, receiverID uint64) (err error)
-	executeImpl      func(seqNo uint64, txRaw []byte)
-	getStateImpl     func() []byte
-	skipToImpl       func(seqNo uint64, snapshotID []byte, peers []uint64)
-	validateImpl     func(txRaw []byte) error
-	viewChangeImpl   func(curView uint64)
-	signImpl         func(msg []byte) ([]byte, error)
-	verifyImpl       func(senderID uint64, signature []byte, message []byte) error
-	getLastSeqNoImpl func() (uint64, error)
+	broadcastImpl       func(msgPayload []byte)
+	unicastImpl         func(msgPayload []byte, receiverID uint64) (err error)
+	executeImpl         func(seqNo uint64, txRaw []byte)
+	getStateImpl        func() []byte
+	skipToImpl          func(seqNo uint64, snapshotID []byte, peers []uint64)
+	validateImpl        func(txRaw []byte) error
+	viewChangeImpl      func(curView uint64)
+	signImpl            func(msg []byte) ([]byte, error)
+	verifyImpl          func(senderID uint64, signature []byte, message []byte) error
+	getLastSeqNoImpl    func() (uint64, error)
+	validateStateImpl   func()
+	invalidateStateImpl func()
 
 	// Closable Consenter methods
 	RecvMsgImpl func(ocMsg *pb.Message, senderHandle *pb.PeerID) error
@@ -485,6 +529,38 @@ func (op *omniProto) StoreState(key string, value []byte) error {
 		return op.StoreStateImpl(key, value)
 	}
 	return fmt.Errorf("unimplemented")
+}
+
+func (op *omniProto) ValidateState() {
+	if nil != op.ValidateStateImpl {
+		op.ValidateStateImpl()
+		return
+	}
+	panic("unimplemented")
+}
+
+func (op *omniProto) InvalidateState() {
+	if nil != op.InvalidateStateImpl {
+		op.InvalidateStateImpl()
+		return
+	}
+	panic("unimplemented")
+}
+
+func (op *omniProto) validateState() {
+	if nil != op.validateStateImpl {
+		op.validateStateImpl()
+		return
+	}
+	panic("unimplemented")
+}
+
+func (op *omniProto) invalidateState() {
+	if nil != op.invalidateStateImpl {
+		op.invalidateStateImpl()
+		return
+	}
+	panic("unimplemented")
 }
 
 /*
