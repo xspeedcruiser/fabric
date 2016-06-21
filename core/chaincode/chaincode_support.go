@@ -115,7 +115,7 @@ func NewChaincodeSupport(chainname ChainName, getPeerEndpoint func() (*pb.PeerEn
 
 	s.userRunsCC = userrunsCC
 
-	s.ccStartupTimeout = ccstartuptimeout
+	s.ccStartupTimeout = ccstartuptimeout * time.Millisecond
 
 	//TODO I'm not sure if this needs to be on a per chain basis... too lowel and just needs to be a global default ?
 	s.chaincodeInstallPath = viper.GetString("chaincode.installpath")
@@ -283,11 +283,18 @@ func (chaincodeSupport *ChaincodeSupport) getArgsAndEnv(cID *pb.ChaincodeID, cLa
 		chaincodeLogger.Debugf("Executable is %s", args[0])
 	case pb.ChaincodeSpec_JAVA:
 		//TODO add security args
-		args = strings.Split(
+		/*args = strings.Split(
 			fmt.Sprintf("/usr/bin/gradle run -p /root -PappArgs=[\"-a\",\"%s\",\"-i\",\"%s\"]"+
 				" -x compileJava -x processResources -x classes", viper.GetString("peer.address"), cID.Name),
-			" ")
-		chaincodeLogger.Debugf("Executable is gradle run on chaincode ID %s", cID.Name)
+			" ")*/
+
+		//TODO Find a way to pass the class name inside docker builder from peer depoloy command
+		className := "example.SimpleSample"
+
+		args = strings.Split(fmt.Sprintf("/usr/bin/java|-cp|/root/build/classes/main:/root/build/output/libs/*|%s|-a|\"%s\"|-i|\"%s\"",
+			className, viper.GetString("peer.address"), cID.Name), "|")
+		chaincodeLogger.Debugf("Executable is %s", strings.Join(args, " "))
+		//chaincodeLogger.Debugf("Executable is gradle run on chaincode ID %s", cID.Name)
 	default:
 		return nil, nil, fmt.Errorf("Unknown chaincodeType: %s", cLang)
 	}

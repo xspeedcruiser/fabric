@@ -43,7 +43,8 @@ func writeChaincodePackage(spec *pb.ChaincodeSpec, tw *tar.Writer) error {
 		//todo
 	} else {
 		newRunLine = fmt.Sprintf("COPY %s /root/\n"+
-			"RUN cd /root/ && gradle build", urlLocation)
+			"RUN cd /root/ && update-java-alternatives -s java-1.8.0-openjdk-amd64", urlLocation)
+		//&& gradle build
 	}
 
 	dockerFileContents := fmt.Sprintf("%s\n%s", viper.GetString("chaincode.java.Dockerfile"), newRunLine)
