@@ -17,6 +17,9 @@ limitations under the License.
 package org.hyperledger.java.shim;
 
 import com.google.protobuf.ByteString;
+import protos.Chaincode;
+import java.util.HashMap;
+
 
 public class ChaincodeStub {
 
@@ -69,14 +72,14 @@ public class ChaincodeStub {
 	 * @param limit
 	 * @return
 	 */
-//	public HashMap<String, String> rangeQueryState(String startKey, String endKey, int limit) {
-//		HashMap<String, String> map = new HashMap<>();
-//		for (RangeQueryStateKeyValue mapping : handler.handleRangeQueryState(
-//				startKey, endKey, limit, uuid).getKeysAndValuesList()) {
-//			map.put(mapping.getKey(), mapping.getValue().toStringUtf8());
-//		}
-//		return map;
-//	}
+	public HashMap<String, String> rangeQueryState(String startKey, String endKey) {
+		HashMap<String, String> map = new HashMap<>();
+		for (Chaincode.RangeQueryStateKeyValue mapping : handler.handleRangeQueryState(
+				startKey, endKey, uuid).getKeysAndValuesList()) {
+			map.put(mapping.getKey(), mapping.getValue().toStringUtf8());
+		}
+		return map;
+	}
 
 	/**
 	 * 
