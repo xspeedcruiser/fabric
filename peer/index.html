@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en" ng-app=explorer>
+	<head>
+		<script src = angular.js></script>
+     	<script src = scripts.js></script>
+     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+     	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+	    <link rel="stylesheet" type="text/css" href="style.css">
+	    <title> Hyperledger Explorer </title>
+	    <meta charset="utf-8">
+
+	    	<div ng-controller="HEADER" class="header">
+	    		<h1>Hyperledger Explorer </h1>
+			</div>
+	</head>
+
+	<body onresize="restore()">
+
+			<div  class="menu-trigger" ng-controller="TRIGGER" >
+				<button class="menu-button" id="button" ng-click="activate()"> Menu </button>
+			</div>	
+
+
+
+		<div id="navigation" class="Navigation" ng-controller="NAVIGATION">
+				<u1> 
+					<li><a href="#A" onClick="hide()" >Search</a></li>
+					<li><a href="#B" onClick="hide()" >Current State</a></li>
+					<li><a href="#C" onClick="hide()" >Recent Blocks</a></li>
+					<li><a href="#D" onClick="hide()" >Transactions</a></li>
+					<li><a href="#E" onClick="hide()" >Network</a></li>
+				</u1>
+		</div>
+
+		<div id="search" class="Search" class="combined" ng-controller="SEARCH">
+			<a name="A"></a>
+				<h2>Search</h2>
+				 <input type = "text" ng-model="response" placeholder= "UUID/Block number">	
+				 <button id="flip" ng-click="search()"> Search </button>
+				 <button ng-click="clear()"> Clear </button>
+				 <button ng-click="work()"> Display </button>
+				 <div class="wrapper">
+				 	<p id="something"> Plz work </p>
+				    <p id="slide"> THis is a test </p>
+				</div>
+
+				<div id="panel">				 	
+					<div class="results">
+						 <p style="overflow: auto;
+		    			  overflow-y:hidden;"> {{ text1 }} </p>
+						 <p style="overflow: auto;
+		    			 overflow-y:hidden;">{{ text2 }} </p>
+						 <p> {{ text3 }} </p>
+						 <p> {{ text4 }} </p>
+						 <p> {{ text5 }} </p>
+						 <p> {{ text6 }} </p>
+					</div>
+
+
+						<form action='#openModal' id="change" style="display:none;">
+						 <input type="submit" value="View Transaction Details">
+						</form>
+				</div>
+
+
+
+
+
+					<div id="openModal" class="modalDialog" style="font-size: 120%; text-align:left;">
+											<div>
+												<a href="#close" title="Close" class="close">X</a>
+												<h2>Transaction Information</h2>
+												<h4>Total number of transactions: {{ info.transactions.length }} </h4>
+													<div ng-repeat="transactions in info.transactions">
+														<p> <b>Transaction#</b> {{ $index+1 }} </p>
+														<p> <b>ChaincodeID:</b> {{transactions.chaincodeID }}</p>
+														<p> <b>UUID:</b> {{ transactions.uuid }} </p>
+														<p> <b>Seconds:</b> {{ transactions.timestamp.seconds}} </p>
+														<p> <b>Nanos:</b> {{ transactions.timestamp.nanos}} </p>
+														<p> <b>Level:</b> {{ transactions.confidentialityLevel }} </p>
+														<p> <b>Payload:</b> {{ transactions.payload }} </p>
+														<p> <b>Nonce:</b> {{ transactions.nonce }} </p>
+														<p> <b>Cert:</b> {{ info.transactions.cert }} </p>
+														<p> <b>Signature:</b> {{ info.transactions.signature }} </p>
+														<p> ____________________________________________ </p>										
+													</div>			
+											</div>
+					</div>
+
+
+		</div>
+
+
+
+		<div id="current" class="Current" ng-controller="CURRENT">
+			<a name ="B"></a>
+				<div id="titles">
+					<h2>Current Status</h2>
+				</div>
+					<p> <b>Current Height: </b> {{ info.height }} </p>
+				      <p> Current Hash: {{ info.currentBlockHash.toString() }} </p>
+				      <p> Previous Hash: {{ info.previousBlockHash }} </p>
+		</div>
+
+
+		<BR>
+		<BR>
+
+		<div id="network" class="Network" ng-controller="NETWORK">
+			<a name="E"></a>
+
+			<div class="titles">
+				<h2>Network Information</h2>
+				<p>Number of Peers connected to Network:  {{ info.peers.length}}</p>
+			</div>
+				<table>												
+						<thead>	
+							</tr>
+								<th> Name </th>
+								<th> Address</th>
+								<th> Type</th>
+								<th> PKIID</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="peers in info.peers ">
+								<td data-label="Name"> {{info.peers[$index].ID.name}} </td>
+								<td data-label="Address"> {{info.peers[$index].address }}  </td>
+								<td data-label="Type"> {{info.peers[$index].type}} </td>
+								<td data-label="PKIID"> {{info.peers[$index].pkiID}} </td>
+							</tr>
+						</tbody>
+				</table>
+		</div>
+
+	<div ng-controller ="BLOCKS_and_TRANSACTIONS">
+		
+
+		<div id="blocks" class="Blocks">
+
+
+		<div ng-show="loader.loading">Loading</div>	
+
+			<a name="C"></a>
+				<div class="titles">
+					<h2>Recent Blocks </h2>
+						<p style="display:inline;"> Number of Blocks: <input type="number" step="1", min="1", max=" {{limit}}", ng-model="row_amount"/>		
+				</div>
+
+
+
+				<div>
+					<table>
+						<thead>	
+							<tr>
+								<th> Block# </th>
+								<th> Age-Seconds</th>
+								<th> Age-Nanos</th>
+								<th> State Hash </th>
+								<th> Previous Hash </th>
+								<th> Consensus Meta </th>
+								<th> Transactions </th>
+							</tr>
+						</thead>
+						<tbody ng-repeat="n in range | limitTo: row_amount" >
+							<tr>
+								<td data-label="Block#"> {{ size - $index -1 }} </td>
+								<td data-label="Age-Seconds"> {{ info[$index].nonHashData.localLedgerCommitTimestamp.seconds}} </td>
+								<td data-label="Age-Nanos"> {{ info[$index].nonHashData.localLedgerCommitTimestamp.nanos}} </td>
+								<td data-label="State Hash"> {{ info[$index].stateHash | limitTo: 15 }}... </td>
+								<td data-label="Previous Hash">{{ info[$index].previousBlockHash | limitTo: 15}}...</td>
+								<td data-label="Consensus Meta"> {{ info[$index].consensusMetadata}} </td>
+								<td data-label="Transactions">
+
+								<button ng-click="ExecuteAll($index)"> View </button>
+								
+								<form action='#openModal2' id="change2" style="display:none;>
+									 <input type="submit" value="Details">
+								</form>
+										<div id="openModal2" class="modalDialog" style="font-size: 120%; text-align:left;">
+											<div>
+												<a href="#close" title="Close" class="close">X</a>
+												<h2>Transaction Information</h2>
+												<h4>Total number of transactions: {{ info[selected].transactions.length }} </h4>
+													<div ng-repeat="transactions in info[selected].transactions">
+														<p> <b>Transaction#</b> {{ $index+1 }} </p>
+														<p> <b>ChaincodeID:</b> {{transactions.chaincodeID }}</p>
+														<p> <b>UUID:</b> {{ transactions.uuid }} </p>
+														<p> <b>Seconds:</b> {{ transactions.timestamp.seconds}} </p>
+														<p> <b>Nanos:</b> {{ transactions.timestamp.nanos}} </p>
+														<p> <b>Level:</b> {{ transactions.confidentialityLevel }} </p>
+														<p> <b>Payload:</b> {{ transactions.payload }} </p>
+														<p> <b>Nonce:</b> {{ transactions.nonce }} </p>
+														<p> <b>Cert:</b> {{ info.transactions.cert }} </p>
+														<p> <b>Signature:</b> {{ info.transactions.signature }} </p>
+														<p> ___________________________________________ </p>										
+												</div>	
+														<h2> Extra Non Hash Data </h2>
+														<p> <b> Seconds: </b> {{ info[selected].nonHashData.localLedgerCommitTimestamp.seconds}}	</p>
+														<p> <b> Nanos: </b> {{ info[selected].nonHashData.localLedgerCommitTimestamp.nanos}}	</p>
+														<p> <b> Transaction Results: </b> {{ info[selected].nonHashData.transactionResults}}	</p>
+												</div>
+										</div>
+							</tr>
+
+							<tr id="flip">
+								<td> Test </td>
+
+
+							</tr>
+						</tbody>
+					</table
+				</div>
+		</div>
+		
+		<BR>
+		<BR>
+
+
+	
+		<div id="transactions" class="Transactions">
+			<a name="D"></a>
+				
+			<div class ="titles">
+				<h2>Latest Transactions</h2>
+					<p> Number of Transactions: <input type="number" step="1", min="1", max="{{trans.length}}", ng-model="row_amount2"/>
+			</div>
+					<table>
+						<thead>	
+							<tr>
+								<th> Block# Origin </th>
+								<th> Seconds</th>
+								<th> Nanos</th>
+								<th> ID </th>
+								<th> UUID </th>
+								<th> Payload </th>
+								<th> Details </th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="items in trans | limitTo: row_amount2">
+								<td data-label="Block# Origin">{{ trans[$index].origin}}  </td>
+								<td data-label="Seconds"> {{ trans[$index].timestamp.seconds }}  </td>
+								<td data-label="Nanos"> {{trans[$index].timestamp.nanos}} </td>
+								<td data-label="ID"> {{trans[$index].chaincodeID | limitTo: 15}}... </td>
+								<td data-label="UUID">{{ trans[$index].uuid | limitTo : 15}}...</td>
+								<td data-label="Payload"> {{trans[$index].payload | limitTo: 15}}... </td>
+								<td data-label="Details">
+
+									<button ng-click="ExecuteAll2($index)"> Expand </button>
+									<form action='#openModal3' id="change3" style="display:none">
+										<input type="submit" value="Full Details">
+									</form>
+
+
+
+										<div id="openModal3" class="modalDialog" style="font-size: 120%; text-align:left;">
+											<div>
+												<a href="#close" title="Close" class="close">X</a>
+												<h2>Transaction Information</h2>	
+													<div>
+														<p> <b>Type:</b> {{trans[selected2].type }}</p>
+														<p> <b>ID:</b> {{ trans[selected2].chaincodeID }} </p>
+														<p> <b>Seconds:</b> {{ trans[selected2].timestamp.seconds}} </p>
+														<p> <b>Nanos:</b> {{ trans[selected2].timestamp.nanos}} </p>
+														<p> <b>UUID:</b> {{ trans[selected2].uuid }} </p>
+														<p> <b>Payload:</b> {{ trans[selected2].payload }} </p>
+														<p> <b>Confidence Level:</b> {{ trans[selected2].confidentialityLevel }} </p>
+														<p> <b>Cert:</b> {{ trans[selected2].cert }} </p>
+														<p> <b>Signature:</b> {{ info.transactions.signature }} </p>
+														<p> ___________________________________________ </p>										
+													</div>			
+											</div>
+										</div>
+									<tr id="2">
+										
+									</tr>
+								</td>
+							</tr>
+
+
+						</tbody>
+						<button onClick="$('#2').slideToggle('slow');">Click  Me!</button>
+					</table>
+			</div>
+		</div>
+	</div>
+
+
+	</body>
+			<BR>
+			<BR>
+
+	<footer>
+			<p>
+			<a href="https://github.com/hyperledger/">Github</a>
+			<a style="text-align:center" 	href="https://www.hyperledger.org/">Hyperledger.org </a>
+				Copyright 2016 DTCC </p>
+	</footer>
+
+</html>
