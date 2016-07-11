@@ -1,5 +1,4 @@
 const REST_ENDPOINT = 'http://127.0.0.1:5000';
-const REST_ENDPOINT2 = 'http://127.0.0.1:5000/chain/blocks/';
 
 var App = angular.module("explorer", []);
 
@@ -74,11 +73,6 @@ App.factory('SHARE_INFORMATION', function($rootScope){
 	return BlockInfo;
 })
 
-App.directive('graph', function(){
-
-
-});
-
 /*-----------------------------Controllers for HTML div elements------------------------------------ */
 
 App.controller("HEADER", 
@@ -90,6 +84,7 @@ App.controller("NAVIGATION",
 	function(){
 	}
 )
+
 
 App.controller("CURRENT", 
 	function($scope, REST_SERVICE_HEIGHT, SHARE_INFORMATION)
@@ -232,13 +227,85 @@ App.controller("NETWORK",
 	}
 )
 
-App.controller("GRAPH",
-	function()
-	{
-				
+// directive for dependency injection, used to inject d3.js graphs into html page
+App.directive('barsChart', function ($parse) {
 
+     var directiveDefinitionObject = {
+        
+         restrict: 'E',
+         replace: false,
+         scope: {data: '=chartData'},
+         link: function (scope, element, attrs) {
+
+	           var chart = d3.select(element[0]);
+
+	            chart.append("div").attr("class", "chart")
+
+		            .selectAll('div')
+		            .data(scope.data).enter().append("div")
+		            .transition().ease("elastic")
+		            .style("width", function(d) { return d + "%"; })
+		            .text(function(d) { return d; })
+
+
+         } 
+      };
+      return directiveDefinitionObject;
+});
+
+
+App.controller("GRAPH",
+	function($scope)
+	{
+		// TODO, just placeholders atm with no meaningful data
+
+				$scope.latency = 50;
+				$scope.capacity = "10.1K";
+
+				$scope.data = {
+					    Options: [
+					      {id: '1', name: 'Option A'},
+					      {id: '2', name: 'Option B'},
+					      {id: '3', name: 'Option C'}
+					    ],
+					    selected: {id: '1', name: 'Option A'}
+					};
+
+				$scope.data2 = {
+					    Options: [
+					      {id: '1', name: 'Option A'},
+					      {id: '2', name: 'Option B'},
+					      {id: '3', name: 'Option C'}
+					    ],
+					    selected: {id: '1', name: 'Option A'}
+					};
+
+				$scope.data3 = {
+					    Options: [
+					      {id: '1', name: 'Option A'},
+					      {id: '2', name: 'Option B'},
+					      {id: '3', name: 'Option C'}
+					    ],
+					    selected: {id: '1', name: 'Option A'}
+					};
+
+				$scope.data4 = {
+					    Options: [
+					      {id: '1', name: 'Option A'},
+					      {id: '2', name: 'Option B'},
+					      {id: '3', name: 'Option C'}
+					    ],
+					    selected: {id: '1', name: 'Option A'}
+					};
+
+			$scope.data_1= [10,20,30,40,60];
+			$scope.data_2= [100,40,20,90,60];
+			$scope.data_3= [110,30,30,20,90];
+			$scope.data_4= [130,70,20,20,70];
 	}
-)
+);
+
+
 
 App.controller("TRIGGER",
 	function($scope){
