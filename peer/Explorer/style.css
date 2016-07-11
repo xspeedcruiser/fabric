@@ -127,8 +127,8 @@ content: none;
 }
 
 .Current{
-	background-color:#1F242B;
-	box-shadow: 3px 3px 3px #02090f;
+   background-color:#1F242B;
+   box-shadow: 3px 3px 3px #02090f;
    border-radius: 5px;
    float: left;
    max-width:35%;
@@ -217,77 +217,148 @@ content: none;
 	margin-bottom: 30px;
 	border-radius: 5px;
 }
+.Graph h2{
+	padding-left:20px;
+	font-size:150%;
+}
 
-.Latency{
-	width:15%;
-	float:left;
-	height:auto;
-	max-width:15%;
-	background-color: #103e69;
-	margin-left: 2.5%;
+.Performance{
+	background-color: #353F4D;
+	float: left;
 	color:#FFFFFF;	
-	border-radius: 5px;
-	margin-bottom:2.5%;
-}
-.Latency p {
-	text-align: center;
-	font-size:350%;
-
-}
-.Latency hr{
-	width:90%;
-	border-style: solid;
-}
-.Latency text{
-
-}
-
-.Capacity{
-	width:15%;
-	height: auto;
-	float:left;
-	max-width:15%;
+	border-radius:5px;
+	height: 300px;
+	width:27.5%;
+	max-width:27.5%;
 	margin-left:2.5%;
-	margin-bottom:5%;
-	background-color: #103e69;
-	 color:#FFFFFF;	
-	 border-radius: 5px;
-	 margin-bottom: 2.5%;
+	box-shadow: 3px 3px 3px #02090f;
 }
-.Capacity hr{
-	width: 90%;
-	border-style: solid;
-}
-.Capacity p{
-	text-align: center;
-	font-size:350%;
-}
-.Capacity text{
-	
-}
-
 .Chaincode{
 	float:left;
-	width:28%;
-	height:150px;
-	margin-left:2.5%;
-	max-width:28%;
-	background-color: #103e69;
+	width:31.25%;
+	height:300px;
+	max-width:31.25%;
+	background-color: #353F4D;
 	color:#FFFFFF;	
 	border-radius: 5px;
+	margin-left:2.5%;
+	box-shadow: 3px 3px 3px #02090f;
 }
 .Volume{
 	float:left;
-	margin-left:2.5%;
-	width:28%;
-	height:150px;
-	max-width:28%;
-	background-color: #103e69;
+	width:31.25%;
+	height:300px;
+	max-width:31.25%;
+	background-color: #353F4D;
 	color:#FFFFFF;	
 	border-radius: 5px;
+	margin-left:2.5%;
+	box-shadow: 3px 3px 3px #02090f;
+}
+
+.Graph2{
+	float:right;
+	color:#FFFFFF;	
+	width:46.25%;
+	max-width: 46.25%;
+	margin-top:5%;
+	margin-right:2.5%;
+	margin-bottom:5%;
+	background-color: #353F4D;
+
+}
+.Symbol{
+	font-weight: bold;
+	margin:0;
+	color:orange;
+	margin-bottom:-14%;
+}
+.Data{
+	font-size:300%;
+	font-weight: bold;
+	text-align: center;
+	margin:0;
+}
+.Symbol2{
+	font-weight: bold;
+	color:#24B3DC;
+	font-size:120%;
+	text-align:right;
+	margin-top:-14%;
+}
+
+.Latency{
+	float:left;
+	margin-left:5%;
+	width:42.5%;
+	max-width:42.5%;
+}
+.Latency h3{
+	padding-bottom:5%; 
+	padding-top:5%;
+}
+.Latency hr{ 
+	margin-bottom:25%; 
+	margin-top:15%;
 }
 
 
+.Capacity{
+	float:left;
+	margin-left:5%;
+	width:42.5%;
+	max-width:42.5%;
+}
+.Capacity h3{ 
+	padding-bottom:5%; 
+	padding-top:5%;
+
+}
+.Capacity hr{ 
+	margin-bottom:25%;
+	margin-top:15%;
+}
+
+.Chaincode p {
+	font-size:130%;
+}
+.Volume p{
+	font-size:130%;
+}
+
+.chart {
+    background: #1F242B;
+    padding: 3px;
+    margin-right:5%;
+    border-radius:5px;
+    margin-top:5%;
+    box-shadow: 2px 2px 2px #666;
+}
+
+.chart div {
+  width:0;
+  transition: all 1s ease-out;
+}
+
+.chart div {
+max-width:90%;
+  font: 10px sans-serif;
+  background-color: #103E69;
+  text-align: right;
+  padding: 3px;
+  margin: 5px;
+  color: white;
+ }
+
+
+.Top{
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	background-color: #103e69;
+	padding-top:1px;
+	padding-bottom:1px;
+	border-bottom: 1px solid black;
+}
 
 .Trans{
 	box-shadow: 3px 3px 3px #02090f;
@@ -449,9 +520,50 @@ button{
 	margin-right:5% !important;
 	max-width:42.5% !important;
 	width:42.5% !important;
-
-
 }
+.Performance{
+	width:90% !important;
+	max-width: 90% !important;
+	margin-left:5% !important;
+	margin-right:5% !important;
+	height: 200px !important;
+	margin-bottom:2.5%;
+}
+.Chaincode{
+	width:90% !important;
+	max-width: 90% !important;
+	margin-left:5% !important;
+	margin-right:5% !important;
+	margin-bottom:20px;
+}
+.Volume{
+	width:90% !important;
+	max-width: 90% !important;
+	margin-left:5% !important;
+	margin-right:5% !important;
+	margin-bottom:2.5%;
+}
+.Capacity h3{ padding-bottom:0 !important}
+.Capacity hr{ 
+	margin-bottom:25px !important;
+	margin-top:25px !important;
+}
+.Latency h3{ padding-bottom:0 !important}
+.Latency hr{ 
+	margin-bottom:25px !important;
+	margin-top:25px !important;
+}
+.Symbol { margin-bottom:-12%; }
+
+.Graph2{
+	max-width: 90% !important;
+	width: 90% !important;
+	margin-right:5% !important;
+	margin-top:0;
+	margin-bottom:2.5% !important;
+}
+
+
 .Network{
 	max-width:90% !important;
 	margin-left:5%;
