@@ -1,9 +1,9 @@
-const REST_ENDPOINT = 'http://127.0.0.1:5000';
+const REST_ENDPOINT = "http://127.0.0.1:5000";
 
 var App = angular.module("explorer", []);
 
 // http request to get get chain information
-App.factory('REST_SERVICE_HEIGHT', function($http){
+App.factory("REST_SERVICE_HEIGHT", function($http){
 	return{
 		getData: function(){
 			return $http.get(REST_ENDPOINT+ "/chain").then(function(result){
@@ -15,8 +15,8 @@ App.factory('REST_SERVICE_HEIGHT', function($http){
 /* http request to retrieve information related to a specific block number found on the chain, chain_index is the block number that we wish to retrieve
 Since each request comes back at a different time and out of order, the order with which we recieve the response cannot be tracked, array_location is thus passed in and is added
 as metadata to keep track of the 0-9 index where the data should be added to the array in the BLOCKS_and_TRANSACTIONS controller that holds the final retrieved inorder result
-*/
-App.factory('REST_SERVICE_BLOCK', function($http) {
+avoids sorting in the future */
+App.factory("REST_SERVICE_BLOCK", function($http) {
    return {
      getData: function(chain_index, array_location) {
      	// initially returns only a promise 
@@ -31,7 +31,7 @@ App.factory('REST_SERVICE_BLOCK', function($http) {
 });
 
 // http request to get block information by block#, used in search, doesn't add any metadata
-App.factory('REST_SERVICE_BLOCK2', function($http) {
+App.factory("REST_SERVICE_BLOCK2", function($http) {
    return {
      getData: function(chain_index) {
        return $http.get(REST_ENDPOINT +"/chain/blocks/"+ chain_index).then(function(result) {   	
@@ -42,7 +42,7 @@ App.factory('REST_SERVICE_BLOCK2', function($http) {
 });
 
 // http request to get transaction information by UUID, used in search 
-App.factory('REST_SERVICE_TRANSACTIONS', function($http){
+App.factory("REST_SERVICE_TRANSACTIONS", function($http){
 	return{
 		getData: function(uuid){
 			return $http.get(REST_ENDPOINT+ "/transactions/"+ uuid).then(function(result){
@@ -55,7 +55,7 @@ App.factory('REST_SERVICE_TRANSACTIONS', function($http){
 and then puts the all the transactions from the 10 recent blocks into an array that gets broadcasted to the TRANSACTION controller that displays it. Likewise, chain
 information also broadcasted to controllers one retrieved
 */
-App.factory('SHARE_INFORMATION', function($rootScope){
+App.factory("SHARE_INFORMATION", function($rootScope){
 	var BlockInfo = {};
 
 	BlockInfo.load_broadcast_transactions = function(data){
@@ -67,7 +67,7 @@ App.factory('SHARE_INFORMATION', function($rootScope){
 		this.broadcastItem();
 	}
 	BlockInfo.broadcastItem = function(){
-		$rootScope.$broadcast('handle_broadcast');
+		$rootScope.$broadcast("handle_broadcast");
 	}
 
 	return BlockInfo;
@@ -221,36 +221,32 @@ App.controller("SEARCH",
 App.controller("NETWORK", 
 	function($scope, $http)
 	{
-		$http.get(REST_ENDPOINT.concat('/network/peers')).
+		$http.get(REST_ENDPOINT.concat("/network/peers")).
 	    success(function(data)
 	     {$scope.info = data;} );
 	}
 )
 
-// directive for dependency injection, used to inject d3.js graphs into html page
-App.directive('barsChart', function ($parse) {
+App.directive("barsChart", function ($parse) {
 
-     var directiveDefinitionObject = {
+     var object = {
         
-         restrict: 'E',
+         restrict: "E",
          replace: false,
-         scope: {data: '=chartData'},
+         scope: {data: "=chartData"},
          link: function (scope, element, attrs) {
 
 	           var chart = d3.select(element[0]);
 
 	            chart.append("div").attr("class", "chart")
-
-		            .selectAll('div')
+		            .selectAll("div")
 		            .data(scope.data).enter().append("div")
 		            .transition().ease("elastic")
 		            .style("width", function(d) { return d + "%"; })
 		            .text(function(d) { return d; })
-
-
          } 
       };
-      return directiveDefinitionObject;
+      return object;
 });
 
 
@@ -258,60 +254,236 @@ App.controller("GRAPH",
 	function($scope)
 	{
 		// TODO, just placeholders atm with no meaningful data
-
 				$scope.latency = 50;
 				$scope.capacity = "10.1K";
 
 				$scope.data = {
 					    Options: [
-					      {id: '1', name: 'Option A'},
-					      {id: '2', name: 'Option B'},
-					      {id: '3', name: 'Option C'}
+					      {id: "1", name: "Option A"},
+					      {id: "2", name: "Option B"},
+					      {id: "3", name: "Option C"}
 					    ],
-					    selected: {id: '1', name: 'Option A'}
+					    selected: {id: "1", name: "Option A"}
 					};
 
 				$scope.data2 = {
 					    Options: [
-					      {id: '1', name: 'Option A'},
-					      {id: '2', name: 'Option B'},
-					      {id: '3', name: 'Option C'}
+					      {id: "1", name: "Option A"},
+					      {id: "2", name: "Option B"},
+					      {id: "3", name: "Option C"}
 					    ],
-					    selected: {id: '1', name: 'Option A'}
-					};
-
-				$scope.data3 = {
-					    Options: [
-					      {id: '1', name: 'Option A'},
-					      {id: '2', name: 'Option B'},
-					      {id: '3', name: 'Option C'}
-					    ],
-					    selected: {id: '1', name: 'Option A'}
-					};
-
-				$scope.data4 = {
-					    Options: [
-					      {id: '1', name: 'Option A'},
-					      {id: '2', name: 'Option B'},
-					      {id: '3', name: 'Option C'}
-					    ],
-					    selected: {id: '1', name: 'Option A'}
+					    selected: {id: "1", name: "Option A"}
 					};
 
 			$scope.data_1= [10,20,30,40,60];
-			$scope.data_2= [100,40,20,90,60];
-			$scope.data_3= [110,30,30,20,90];
-			$scope.data_4= [130,70,20,20,70];
+			$scope.data_2= [100,40,20,90,60];	
 	}
 );
 
 
+App.controller("BAR_GRAPH", 
+	function($scope){
+
+
+		//TODO, at the moment, data is meaningless, doesn't show anythinig useful
+		$scope.graph_data = [{x: 2,y: 4}, {x: 19,y: 21}, {x: 38,y: 8}, {x: 63,y: 28}, {x: 77,y: 6}, {x: 91,y: 60}];
+
+				var Bar_graph = d3.select("#bar_graph"),
+
+				  	// set width, height, margins
+				    Width = 500,
+				    Height = 400,
+				    Margins = {top: 50, bottom: 50, left: 50, right: 50},
+
+
+				    // set x and y domain and range
+					xRange = d3.scale.ordinal().rangeRoundBands([Margins.left, Width - Margins.right], 0.1).domain($scope.graph_data.map(function(d) {
+					    return d.x;
+					    }));
+
+					yRange = d3.scale.linear().range([Height - Margins.top, Margins.bottom]).domain([0, d3.max($scope.graph_data, function(d) { 
+					 	return d.y; 
+					  	})]);
+
+					// generate x axis
+				    xAxis = d3.svg.axis()
+				        .scale(xRange)
+				        .tickSize(3)
+				        .tickSubdivide(true),
+
+				    // generate y axis
+				    yAxis = d3.svg.axis()
+				        .scale(yRange)
+				        .tickSize(2)
+				        .orient("left")
+				        .tickSubdivide(true);
+
+				    // draw x axis
+					Bar_graph.append("svg:g")
+					    .attr("class", "x axis")
+					    .attr("transform", "translate(0," + (Height - Margins.bottom) + ")")
+					    .call(xAxis);
+
+					// draw y axis
+				  	Bar_graph.append("svg:g")
+					    .attr("class", "y axis")
+					    .attr("transform", "translate(" + (Margins.left) + ",0)")
+					    .call(yAxis);
+
+					// draw graph title 
+					Bar_graph.append("text")
+				        .attr("x", (Width / 2))             
+				        .attr("y", 20)
+				        .attr("text-anchor", "middle")  
+				        .style("font-size", "20px") 
+				        .style("fill", "#FFFFFF")
+				        .style("text-decoration", "underline")  
+				        .text("X vs Y Bar Graph");
+
+				    // draw x axis title
+				    Bar_graph.append("text")
+				        .attr("x", (Width / 2))             
+				        .attr("y", Height- 15)
+				        .attr("text-anchor", "middle")  
+				        .style("font-size", "14px")
+				        .style("fill", "#FFFFFF") 
+				        .text("X axis");
+
+				    // draw y axis title
+				    Bar_graph.append("text")
+				        .attr("x", -170)             
+				        .attr("y", 20)
+				        .style("font-size", "14px")
+				        .style("text-anchor", "end")
+				        .style("fill", "#FFFFFF")
+				        .attr("transform", "rotate(-90)" )
+				        .text("Y axis");
+
+				    // draw data
+				    Bar_graph.selectAll("rect")
+					  .data($scope.graph_data)
+					  .enter()
+					  .append("rect")
+					  .attr("x", function(d) {  return xRange(d.x); })
+					  .attr("y", function(d) { return yRange(d.y); })
+					  .attr("width", xRange.rangeBand()) 
+					  .attr("height", function(d) { return ((Height - Margins.bottom) - yRange(d.y)); })
+					  .attr("fill", "#103E69");  
+	
+})
+
+
+App.controller("LINE_GRAPH",
+	function($scope){
+
+		//TODO, at the moment, data is meaningless, doesn't show anythinig useful
+		$scope.data_4= [{x: 10,y: 5}, {x: 14,y: 11}, {x: 21,y: 13} , {x: 27,y: 21}, {x: 41,y: 27}];
+
+				var graph = d3.select("#line_graph"),
+
+					// set height, width and margins
+					Height = 400
+					Width = 500
+					Margins = { top: 50, bottom:50, left: 50, right: 20},
+
+					// set range and domain for x
+					xRange = d3.scale.linear().range([Margins.left, Width - Margins.right]).domain([d3.min($scope.data_4, function(d) {
+				      return d.x;
+				    }), 
+				    d3.max($scope.data_4, function(d) { 
+				    	return d.x; 
+				    	})]),
+
+					// set range and domain for y 
+				    yRange = d3.scale.linear().range([Height - Margins.top, Margins.bottom]).domain([d3.min($scope.data_4, function(d) {
+				        return d.y;
+				    	}), 
+				    d3.max($scope.data_4, function(d) {
+				        return d.y;
+				   		})]);
+
+			    	// generate y axis
+				    xAxis = d3.svg.axis()
+				      .scale(xRange)
+				      .tickSize(2)
+				      .ticks(10)
+				      .tickSubdivide(true);
+
+				    // generate y axis
+				    yAxis = d3.svg.axis()
+				      .scale(yRange)
+				      .tickSize(2)
+				      .ticks(10)
+				      .orient("left")
+				      .tickSubdivide(true);
+
+				    // draw x axis
+			      	graph.append("svg:g")
+					  .attr("class", "x axis")
+					  .attr("transform", "translate(0," + (Height - Margins.bottom) + ")")
+					  .call(xAxis);
+
+					// draw y axis
+					graph.append("svg:g")
+					  .attr("class", "y axis")
+					  .attr("transform", "translate(" + (Margins.left) + ",0)")
+					  .call(yAxis);
+
+					// draw graph title
+					graph.append("text")
+				        .attr("x", (Width / 2))             
+				        .attr("y", 20)
+				        .attr("text-anchor", "middle") 
+				        .style("fill", "#FFFFFF") 
+				        .style("font-size", "20px") 
+				        .style("text-decoration", "underline")  
+				        .text("X vs Y Line Graph");
+
+				    // draw x axis label
+				    graph.append("text")
+				        .attr("x", (Width / 2))             
+				        .attr("y", Height- 15)
+				        .attr("text-anchor", "middle")  
+				        .style("font-size", "14px") 
+				        .style("fill", "#FFFFFF")
+				        .text("X axis");
+
+				    // draw y axis label
+				    graph.append("text")
+				        .attr("x", -170)             
+				        .attr("y", 20)
+				        .style("font-size", "14px")
+				        .style("text-anchor", "end")
+				        .style("fill", "#FFFFFF")
+				        .attr("transform", "rotate(-90)" )
+				        .text("Y axis");
+
+
+				    // function to generate line
+					var generate_line = d3.svg.line()
+						    .x(function(d) {
+						   		return xRange(d.x);
+						    	})
+						 	.y(function(d) {
+						    	return yRange(d.y);
+							    })
+						  .interpolate("linear");
+
+					// draw line on graph
+					graph.append("svg:path")
+						  .attr("d", generate_line($scope.data_4))
+						  .attr("stroke", "#FFFFFF")
+						  .attr("fill", "none")
+						  .attr("stroke-width", 3);
+
+	}
+)
 
 App.controller("TRIGGER",
 	function($scope){
 		// collapse and expand navigation menu in mobile/smaller resolution view 
 		$scope.activate = function(){
-			x = document.getElementById('navigation').style.display;
+			x = document.getElementById("navigation").style.display;
 				if(x =="none"){
 					document.getElementById("navigation").style.display = "block";
 				} else {
@@ -432,7 +604,7 @@ App.controller("TRANSACTIONS",
 // used to keep navigation menu displayed horizontally, runs whenever window resizes 
 function restore() {
 	var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-	if(width > 500 ){
+	if(width > 600 ){
 		document.getElementById("navigation").style.display = "block";
 	} else {
 		document.getElementById("navigation").style.display = "none";
