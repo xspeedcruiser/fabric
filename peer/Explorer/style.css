@@ -1,5 +1,5 @@
 html * {
-	font-family: "Times New Roman", Times, serif;
+	font-family: 'Lalezar', cursive;
 }
 
 .Header{
@@ -77,7 +77,7 @@ content: none;
 	padding-bottom:10px;
 }
 
-@media screen and (max-width: 500px){
+@media screen and (max-width: 600px){
 	.Navigation{
 		float:none;
 		line-height: 20px;
@@ -256,17 +256,6 @@ content: none;
 	box-shadow: 3px 3px 3px #02090f;
 }
 
-.Graph2{
-	float:right;
-	color:#FFFFFF;	
-	width:46.25%;
-	max-width: 46.25%;
-	margin-top:5%;
-	margin-right:2.5%;
-	margin-bottom:5%;
-	background-color: #353F4D;
-
-}
 .Symbol{
 	font-weight: bold;
 	margin:0;
@@ -274,7 +263,7 @@ content: none;
 	margin-bottom:-14%;
 }
 .Data{
-	font-size:300%;
+	font-size:200%;
 	font-weight: bold;
 	text-align: center;
 	margin:0;
@@ -333,6 +322,7 @@ content: none;
     border-radius:5px;
     margin-top:5%;
     box-shadow: 2px 2px 2px #666;
+    height: 120px;
 }
 
 .chart div {
@@ -341,7 +331,7 @@ content: none;
 }
 
 .chart div {
-max-width:90%;
+  max-width:90%;
   font: 10px sans-serif;
   background-color: #103E69;
   text-align: right;
@@ -358,6 +348,53 @@ max-width:90%;
 	padding-top:1px;
 	padding-bottom:1px;
 	border-bottom: 1px solid black;
+}
+
+.Graph2{
+	float:right;
+	overflow: scroll;
+	overflow-y:hidden;
+	position: relative;
+	color:#FFFFFF;	
+	width:46.25%;
+	max-width: 46.25%;
+	margin-top:5%;
+	margin-right:2.5%;
+	margin-bottom:5%;
+	background-color: #353F4D;
+	box-shadow: 3px 3px 3px #02090f;
+}
+.Graph2-content{
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+#line_graph{
+	background: #1F242B;
+	width:90%;
+	height: 400px;
+	width: 500px;
+	margin-left:5%;
+	margin-top:20px;
+    box-shadow: 2px 2px 2px #666;
+}
+
+#bar_graph{
+	background: #1F242B;
+	height: 400px;
+	width: 500px;
+	margin-left:5%;
+	margin-top:20px;
+	margin-bottom:20px;
+   box-shadow: 2px 2px 2px #666;
+}
+.x.axis{
+	fill:#FFFFFF;
+}
+.y.axis{
+	fill:#FFFFFF;
 }
 
 .Trans{
