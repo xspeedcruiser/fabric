@@ -1,10 +1,11 @@
 <!doctype html>
 <html lang="en" ng-app=explorer>
 	<header>
-	<script src = angular.js></script>
+		<script src = angular.js></script>
      	<script src = scripts.js></script>
      	<script src="http://d3js.org/d3.v2.js"></script>
      	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+     	<link href="https://fonts.googleapis.com/css?family=Anton" rel="stylesheet"> 
      	
 	    <link rel="stylesheet" type="text/css" href="style.css">
 
@@ -81,7 +82,7 @@
 												<h2 style="text-align:center">Transaction Information</h2>
 												<h4>Total number of transactions: {{ info[selected].transactions.length }} </h4>
 													<div ng-repeat="transactions in info[selected].transactions">
-														<p> <b>Transaction#</b> {{ $index+1 }} </p>
+														<p style="text-align:center"> <b>Transaction#</b> {{ $index+1 }} </p>
 														<p> <b>ChaincodeID:</b> {{transactions.chaincodeID }}</p>
 														<p> <b>UUID:</b> {{ transactions.uuid }} </p>
 														<p> <b>Date:</b> {{ transactions.date }} </p>
@@ -146,7 +147,7 @@
 												<h2 style="text-align:center">Transaction Information</h2>
 												<h4>Total number of transactions: {{ info.transactions.length }} </h4>
 													<div ng-repeat="transactions in info.transactions">
-														<p> <b>Transaction#</b> {{ $index+1 }} </p>
+														<p style="text-align:center"> <b>Transaction#</b> {{ $index+1 }} </p>
 														<p> <b>ChaincodeID:</b> {{transactions.chaincodeID }}</p>
 														<p> <b>UUID:</b> {{ transactions.uuid }} </p>
 														<p> <b>Date: </b> {{ transactions.date}} </p>
@@ -245,30 +246,19 @@
 						</p>
 				</div>
 
-				<div id="graph2" class="Graph2">
+				<div id="graph2" class="Graph2" style="height:500px" ng-controller="LINE_GRAPH">
 					<div id="top" class="Top">
-						<h2> Chaincode </h2>
+						<h2> Graph #4 </h2>
 					</div>
-						<p style="padding-left:5%"> Transaction <b>TYPE </b> 
-						    <select name="mySelect" id="mySelect"
-						      ng-options="option.name for option in data.Options track by option.id"
-						      ng-model="data3.selected"></select> 
-						      	<bars-chart chart-data="data_3" ></bars-chart>
-						</p>
-
+						      <svg id="line_graph">
+						      </svg>
 				</div>
 
-				<div id="graph2" class="Graph2">
+				<div id="graph2" class="Graph2" ng-controller="BAR_GRAPH">
 					<div id="top" class="Top">
-						<h2> Chaincode </h2>
+						<h2> Graph #3 </h2>
 					</div>
-						<p style="padding-left:5%"> Transaction <b>TYPE </b> 
-						    <select name="mySelect" id="mySelect"
-						      ng-options="option.name for option in data.Options track by option.id"
-						      ng-model="data4.selected"></select> 
-						      	<bars-chart chart-data="data_4" ></bars-chart>
-						</p>
-
+						<svg id="bar_graph"> </svg>
 				</div>
 	</div>
 
@@ -339,9 +329,7 @@
 
 
 <footer>
-	<div class="Footer_content">
-			
-	</div>
+	<div class="Footer_content"></div>
 </footer>
 
 
