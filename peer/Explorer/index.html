@@ -1,51 +1,48 @@
+<!-- Copyright DTCC 2016 All Rights Reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.-->
 <!doctype html>
 <html lang="en" ng-app=explorer>
 	<header>
 		<script src = angular.js></script>
-     	<script src = scripts.js></script>
-     	<script src="http://d3js.org/d3.v2.js"></script>
-     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-     	<link href="https://fonts.googleapis.com/css?family=Anton" rel="stylesheet"> 
-     	<!-- Copyright DTCC 2016 All Rights Reserved.
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
-	
-	         http://www.apache.org/licenses/LICENSE-2.0
-	
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.-->
-     	
-	    <link rel="stylesheet" type="text/css" href="style.css">
+     		<script src = scripts.js></script>
+     		<script src="http://d3js.org/d3.v2.js"></script>
+     		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+     		<link href="https://fonts.googleapis.com/css?family=Anton" rel="stylesheet"> 
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<title> Hyperledger Explorer </title>
+		<meta charset="utf-8">
+	  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	    <title> Hyperledger Explorer </title>
-	    <meta charset="utf-8">
-	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-	    <div id="header" class="Header" ng-controller="HEADER">
+		 <div id="header" class="Header" ng-controller="HEADER">
 	    		<h1>Hyperledger Explorer </h1>
 		</div>
 	</header>
 
 <body onresize="restore()">
 
-
 	<div  class="menu-trigger" ng-controller="TRIGGER" >
 		<button class="menu-button" id="button" ng-click="activate()"> Menu </button>
 	</div>	
 
 	<div id="navigation" class="Navigation" ng-controller="NAVIGATION">
-				<u1> 
-					<li><a href="#A" onClick="hide()" >Recent Blocks</a></li>
-					<li><a href="#B" onClick="hide()" >Current State</a></li>
-					<li><a href="#C" onClick="hide()" >Search</a></li>
-					<li><a href="#D" onClick="hide()" >Network</a></li>
-					<li><a href="#E" onClick="hide()" >Visualization</a></li>
-					<li><a href="#F" onClick="hide()" >Transactions</a></li>
-				</u1>
+		<u1> 
+			<li><a href="#A" onClick="hide()" >Recent Blocks</a></li>
+			<li><a href="#B" onClick="hide()" >Current State</a></li>
+			<li><a href="#C" onClick="hide()" >Search</a></li>
+			<li><a href="#D" onClick="hide()" >Network</a></li>
+			<li><a href="#E" onClick="hide()" >Visualization</a></li>
+			<li><a href="#F" onClick="hide()" >Transactions</a></li>
+		</u1>
 	</div>
 
 	<div id="block" class="Block" ng-controller="BLOCKS">
@@ -120,11 +117,11 @@
 		<div  class="Block_title">
 			<h1> <b> Current State of the BlockChain </b> </h1>	
 		</div>
-				<div class="Current_info">
-					<text> <b>Height: </b> {{ info.height }} </text>
-				    <p> <b>Current Hash:</b> {{ info.currentBlockHash }} </p>
-				    <p> <b>Previous Hash:</b> {{ info.previousBlockHash }} </p>
-				</div>
+			<div class="Current_info">
+				<text> <b>Height: </b> {{ info.height }} </text>
+				<p> <b>Current Hash:</b> {{ info.currentBlockHash }} </p>
+				<p> <b>Previous Hash:</b> {{ info.previousBlockHash }} </p>
+			</div>
 	</div>
 
 	<div id="search" class="Search" ng-controller="SEARCH">
