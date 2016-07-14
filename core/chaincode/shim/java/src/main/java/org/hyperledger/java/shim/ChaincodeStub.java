@@ -80,6 +80,14 @@ public class ChaincodeStub {
 		}
 		return map;
 	}
+	public HashMap<String, ByteString> rangeQueryRawState(String startKey, String endKey) {
+		HashMap<String, ByteString> map = new HashMap<>();
+		for (Chaincode.RangeQueryStateKeyValue mapping : handler.handleRangeQueryState(
+				startKey, endKey, uuid).getKeysAndValuesList()) {
+			map.put(mapping.getKey(), mapping.getValue());
+		}
+		return map;
+	}
 
 	/**
 	 * 
