@@ -245,32 +245,27 @@ App.controller("NETWORK",
 	}
 )
 
+// directive for dependency injection, creates html element that gets injected into index.html with charts
 App.directive("barsChart", function ($parse) {
-
      var object = {
-        
-         restrict: "E",
-         replace: false,
-         scope: {data: "=chartData"},
-         link: function (scope, element, attrs) {
-
-	           var chart = d3.select(element[0]);
-
-	            chart.append("div").attr("class", "chart")
-		            .selectAll("div")
-		            .data(scope.data).enter().append("div")
-		            .transition().ease("elastic")
-		            .style("width", function(d) { return d + "%"; })
-		            .text(function(d) { return d; })
-         } 
+       		restrict: "E",
+        	replace: false,
+        	scope: {data: "=chartData"},
+         	link: function (scope, element, attrs) {
+			var chart = d3.select(element[0]);
+			 chart.append("div").attr("class", "chart")
+			 	.selectAll("div")
+				.data(scope.data).enter().append("div")
+				.transition().ease("elastic")
+				.style("width", function(d) { return d + "%"; })
+				.text(function(d) { return d; })
+        } 
       };
       return object;
 });
 
-
 App.controller("GRAPH",
-	function($scope)
-	{
+	function($scope){
 		// TODO, just placeholders atm with no meaningful data
 		$scope.latency = 50;
 		$scope.capacity = "10.1K";
@@ -298,199 +293,191 @@ App.controller("GRAPH",
 
 App.controller("BAR_GRAPH", 
 	function($scope){
-
-
 		//TODO, at the moment, data is meaningless, doesn't show anythinig useful
 		$scope.graph_data = [{x: 2,y: 4}, {x: 19,y: 21}, {x: 38,y: 8}, {x: 63,y: 28}, {x: 77,y: 6}, {x: 91,y: 60}];
 
-				var Bar_graph = d3.select("#bar_graph"),
+		var Bar_graph = d3.select("#bar_graph"),
 
-				  	// set width, height, margins
-				    Width = 500,
-				    Height = 400,
-				    Margins = {top: 50, bottom: 50, left: 50, right: 50},
+			// set width, height, margins
+			Width = 500,
+			Height = 400,
+			Margins = {top: 50, bottom: 50, left: 50, right: 50},
 
+			// set x and y domain and range
+			xRange = d3.scale.ordinal().rangeRoundBands([Margins.left, Width - Margins.right], 0.1).domain($scope.graph_data.map(function(d) {
+				return d.x;
+			}));
 
-				    // set x and y domain and range
-					xRange = d3.scale.ordinal().rangeRoundBands([Margins.left, Width - Margins.right], 0.1).domain($scope.graph_data.map(function(d) {
-					    return d.x;
-					    }));
+			yRange = d3.scale.linear().range([Height - Margins.top, Margins.bottom]).domain([0, d3.max($scope.graph_data, function(d) { 
+				return d.y; 
+			})]);
 
-					yRange = d3.scale.linear().range([Height - Margins.top, Margins.bottom]).domain([0, d3.max($scope.graph_data, function(d) { 
-					 	return d.y; 
-					  	})]);
+			// generate x axis
+			xAxis = d3.svg.axis()
+				.scale(xRange)
+				.tickSize(3)
+				.tickSubdivide(true),
 
-					// generate x axis
-				    xAxis = d3.svg.axis()
-				        .scale(xRange)
-				        .tickSize(3)
-				        .tickSubdivide(true),
+			// generate y axis
+			yAxis = d3.svg.axis()
+				.scale(yRange)
+				.tickSize(2)
+				.orient("left")
+				.tickSubdivide(true);
 
-				    // generate y axis
-				    yAxis = d3.svg.axis()
-				        .scale(yRange)
-				        .tickSize(2)
-				        .orient("left")
-				        .tickSubdivide(true);
+			// draw x axis
+			Bar_graph.append("svg:g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + (Height - Margins.bottom) + ")")
+				.call(xAxis);
 
-				    // draw x axis
-					Bar_graph.append("svg:g")
-					    .attr("class", "x axis")
-					    .attr("transform", "translate(0," + (Height - Margins.bottom) + ")")
-					    .call(xAxis);
+			// draw y axis
+			Bar_graph.append("svg:g")
+				.attr("class", "y axis")
+				.attr("transform", "translate(" + (Margins.left) + ",0)")
+				.call(yAxis);
 
-					// draw y axis
-				  	Bar_graph.append("svg:g")
-					    .attr("class", "y axis")
-					    .attr("transform", "translate(" + (Margins.left) + ",0)")
-					    .call(yAxis);
+			// draw graph title 
+			Bar_graph.append("text")
+				.attr("x", (Width / 2))             
+				.attr("y", 20)
+				.attr("text-anchor", "middle")  
+				.style("font-size", "20px") 
+				.style("fill", "#FFFFFF")
+				.style("text-decoration", "underline")  
+				.text("X vs Y Bar Graph");
 
-					// draw graph title 
-					Bar_graph.append("text")
-				        .attr("x", (Width / 2))             
-				        .attr("y", 20)
-				        .attr("text-anchor", "middle")  
-				        .style("font-size", "20px") 
-				        .style("fill", "#FFFFFF")
-				        .style("text-decoration", "underline")  
-				        .text("X vs Y Bar Graph");
+			// draw x axis title
+			Bar_graph.append("text")
+				.attr("x", (Width / 2))             
+				.attr("y", Height- 15)
+				.attr("text-anchor", "middle")  
+				.style("font-size", "14px")
+				.style("fill", "#FFFFFF") 
+				.text("X axis");
 
-				    // draw x axis title
-				    Bar_graph.append("text")
-				        .attr("x", (Width / 2))             
-				        .attr("y", Height- 15)
-				        .attr("text-anchor", "middle")  
-				        .style("font-size", "14px")
-				        .style("fill", "#FFFFFF") 
-				        .text("X axis");
+			// draw y axis title
+			Bar_graph.append("text")
+				.attr("x", -170)             
+				.attr("y", 20)
+				.style("font-size", "14px")
+				.style("text-anchor", "end")
+				.style("fill", "#FFFFFF")
+				.attr("transform", "rotate(-90)" )
+				.text("Y axis");
 
-				    // draw y axis title
-				    Bar_graph.append("text")
-				        .attr("x", -170)             
-				        .attr("y", 20)
-				        .style("font-size", "14px")
-				        .style("text-anchor", "end")
-				        .style("fill", "#FFFFFF")
-				        .attr("transform", "rotate(-90)" )
-				        .text("Y axis");
-
-				    // draw data
-				    Bar_graph.selectAll("rect")
-					  .data($scope.graph_data)
-					  .enter()
-					  .append("rect")
-					  .attr("x", function(d) {  return xRange(d.x); })
-					  .attr("y", function(d) { return yRange(d.y); })
-					  .attr("width", xRange.rangeBand()) 
-					  .attr("height", function(d) { return ((Height - Margins.bottom) - yRange(d.y)); })
-					  .attr("fill", "#103E69");  
-	
+			// draw data
+			Bar_graph.selectAll("rect")
+				.data($scope.graph_data)
+				.enter()
+				.append("rect")
+				.attr("x", function(d) {  return xRange(d.x); })
+				.attr("y", function(d) { return yRange(d.y); })
+				.attr("width", xRange.rangeBand()) 
+				.attr("height", function(d) { return ((Height - Margins.bottom) - yRange(d.y)); })
+				.attr("fill", "#103E69");  
 })
-
 
 App.controller("LINE_GRAPH",
 	function($scope){
-
 		//TODO, at the moment, data is meaningless, doesn't show anythinig useful
 		$scope.data_4= [{x: 10,y: 5}, {x: 14,y: 11}, {x: 21,y: 13} , {x: 27,y: 21}, {x: 41,y: 27}];
 
-				var graph = d3.select("#line_graph"),
+		var graph = d3.select("#line_graph"),
 
-					// set height, width and margins
-					Height = 400
-					Width = 500
-					Margins = { top: 50, bottom:50, left: 50, right: 20},
+			// set height, width and margins
+			Height = 400
+			Width = 500
+			Margins = { top: 50, bottom:50, left: 50, right: 20},
 
-					// set range and domain for x
-					xRange = d3.scale.linear().range([Margins.left, Width - Margins.right]).domain([d3.min($scope.data_4, function(d) {
-				      return d.x;
-				    }), 
-				    d3.max($scope.data_4, function(d) { 
-				    	return d.x; 
-				    	})]),
+			// set range and domain for x
+			xRange = d3.scale.linear().range([Margins.left, Width - Margins.right]).domain([d3.min($scope.data_4, function(d) {
+				return d.x;
+			}), 
+				d3.max($scope.data_4, function(d) { 
+					return d.x; 
+			})]),
 
-					// set range and domain for y 
-				    yRange = d3.scale.linear().range([Height - Margins.top, Margins.bottom]).domain([d3.min($scope.data_4, function(d) {
-				        return d.y;
-				    	}), 
-				    d3.max($scope.data_4, function(d) {
-				        return d.y;
-				   		})]);
+			// set range and domain for y 
+			yRange = d3.scale.linear().range([Height - Margins.top, Margins.bottom]).domain([d3.min($scope.data_4, function(d) {
+				return d.y;
+			}), 
+				d3.max($scope.data_4, function(d) {
+					return d.y;
+			})]);
 
-			    	// generate y axis
-				    xAxis = d3.svg.axis()
-				      .scale(xRange)
-				      .tickSize(2)
-				      .ticks(10)
-				      .tickSubdivide(true);
+			// generate y axis
+			xAxis = d3.svg.axis()
+				.scale(xRange)
+				.tickSize(2)
+				.ticks(10)
+				.tickSubdivide(true);
 
-				    // generate y axis
-				    yAxis = d3.svg.axis()
-				      .scale(yRange)
-				      .tickSize(2)
-				      .ticks(10)
-				      .orient("left")
-				      .tickSubdivide(true);
+			// generate y axis
+			yAxis = d3.svg.axis()
+				.scale(yRange)
+				.tickSize(2)
+				.ticks(10)
+				.orient("left")
+				.tickSubdivide(true);
 
-				    // draw x axis
-			      	graph.append("svg:g")
-					  .attr("class", "x axis")
-					  .attr("transform", "translate(0," + (Height - Margins.bottom) + ")")
-					  .call(xAxis);
+			// draw x axis
+			graph.append("svg:g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + (Height - Margins.bottom) + ")")
+				.call(xAxis);
 
-					// draw y axis
-					graph.append("svg:g")
-					  .attr("class", "y axis")
-					  .attr("transform", "translate(" + (Margins.left) + ",0)")
-					  .call(yAxis);
+			// draw y axis
+			graph.append("svg:g")
+				.attr("class", "y axis")
+				.attr("transform", "translate(" + (Margins.left) + ",0)")
+				.call(yAxis);
 
-					// draw graph title
-					graph.append("text")
-				        .attr("x", (Width / 2))             
-				        .attr("y", 20)
-				        .attr("text-anchor", "middle") 
-				        .style("fill", "#FFFFFF") 
-				        .style("font-size", "20px") 
-				        .style("text-decoration", "underline")  
-				        .text("X vs Y Line Graph");
+			// draw graph title
+			graph.append("text")
+				.attr("x", (Width / 2))             
+				.attr("y", 20)
+				.attr("text-anchor", "middle") 
+				.style("fill", "#FFFFFF") 
+				.style("font-size", "20px") 
+				.style("text-decoration", "underline")  
+				.text("X vs Y Line Graph");
 
-				    // draw x axis label
-				    graph.append("text")
-				        .attr("x", (Width / 2))             
-				        .attr("y", Height- 15)
-				        .attr("text-anchor", "middle")  
-				        .style("font-size", "14px") 
-				        .style("fill", "#FFFFFF")
-				        .text("X axis");
+			// draw x axis label
+			graph.append("text")
+				.attr("x", (Width / 2))             
+				.attr("y", Height- 15)
+				.attr("text-anchor", "middle")  
+				.style("font-size", "14px") 
+				.style("fill", "#FFFFFF")
+				.text("X axis");
 
-				    // draw y axis label
-				    graph.append("text")
-				        .attr("x", -170)             
-				        .attr("y", 20)
-				        .style("font-size", "14px")
-				        .style("text-anchor", "end")
-				        .style("fill", "#FFFFFF")
-				        .attr("transform", "rotate(-90)" )
-				        .text("Y axis");
+			// draw y axis label
+			graph.append("text")
+				.attr("x", -170)             
+				.attr("y", 20)
+				.style("font-size", "14px")
+				.style("text-anchor", "end")
+				.style("fill", "#FFFFFF")
+				.attr("transform", "rotate(-90)" )
+				.text("Y axis");
 
-
-				    // function to generate line
-					var generate_line = d3.svg.line()
-						    .x(function(d) {
-						   		return xRange(d.x);
-						    	})
-						 	.y(function(d) {
-						    	return yRange(d.y);
-							    })
-						  .interpolate("linear");
-
-					// draw line on graph
-					graph.append("svg:path")
-						  .attr("d", generate_line($scope.data_4))
-						  .attr("stroke", "#FFFFFF")
-						  .attr("fill", "none")
-						  .attr("stroke-width", 3);
-
+			 // generate line
+			var generate_line = d3.svg.line()
+				.x(function(d) {
+					return xRange(d.x);
+				})
+				.y(function(d) {
+					return yRange(d.y);
+				})
+				.interpolate("linear");
+				
+			// draw line on graph
+			graph.append("svg:path")
+				.attr("d", generate_line($scope.data_4))
+				.attr("stroke", "#FFFFFF")
+				.attr("fill", "none")
+				.attr("stroke-width", 3);
 	}
 )
 
