@@ -18,3 +18,6 @@ You should now be able to open up index.html in the browser of your choice and h
 
 You can modify this at any time depending on you http server specifications
 
+Video Demonstration:
+https://vimeo.com/174814785
+
