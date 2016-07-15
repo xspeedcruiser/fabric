@@ -46,69 +46,67 @@ limitations under the License.-->
 	</div>
 
 	<div id="block" class="Block" ng-controller="BLOCKS">
-			<a name="A"></a>
-				<div class="Block_title">
-					<h1><b>Recent Blocks </b></h1>	
-				</div>
+		<a name="A"></a>
+			<div class="Block_title">
+				<h1><b>Recent Blocks </b></h1>	
+			</div>
 
-				<div class="Loading_symbol" ng-show="loader.loading">Loading...</div>	
+			<div class="Loading_symbol" ng-show="loader.loading">Loading...</div>	
+				<table>
+					<thead>	
+						<tr>
+							<th> Block# </th>
+							<th> State Hash </th>
+							<th> Previous Hash </th>
+							<th> Log </th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="n in range">
+							<td data-label="Block#"> {{ size - $index -1 }} </td>
+							<td data-label="State Hash"> {{ info[$index].stateHash | limitTo: 17 }}... </td>
+							<td data-label="Previous Hash">{{ info[$index].previousBlockHash | limitTo: 17}}...</td>
+							<td data-label="Log">
 
-					<table>
-						<thead>	
-							<tr>
-								<th> Block# </th>
-								<th> State Hash </th>
-								<th> Previous Hash </th>
-								<th> Log </th>
-							</tr>
-						</thead>
-						<tbody  >
-							<tr ng-repeat="n in range">
-								<td data-label="Block#"> {{ size - $index -1 }} </td>
-								<td data-label="State Hash"> {{ info[$index].stateHash | limitTo: 17 }}... </td>
-								<td data-label="Previous Hash">{{ info[$index].previousBlockHash | limitTo: 17}}...</td>
-								<td data-label="Log">
-
-								<button ng-click="Update_selected_block($index)"> View </button>
-								
-								<form action='#openModal2' id="change2" style="display:none;>
-									 <input type="submit" value="Details">
-								</form>
-										<div id="openModal2" class="modalDialog" style="font-size: 120%; text-align:left;">
-											<div>
-												<a href="#close" title="Close" class="close">X</a>
-												<h2 style="text-align:center"> Extra Non Hash Data</h2>
-														<p> <b> Date: </b> {{ info[selected].nonHashData.localLedgerCommitTimestamp.date }} </p>
-														<p> <b> Seconds: </b> {{ info[selected].nonHashData.localLedgerCommitTimestamp.seconds}}	</p>
-														<p> <b> Nanos: </b> {{ info[selected].nonHashData.localLedgerCommitTimestamp.nanos}}	</p>
-														<p> <b> Consensus Metadata: </b> {{ info[selected].consensusMetadata}} </p>
-														<p> <b> Transaction Results: </b> {{ info[selected].nonHashData.transactionResults}}	</p>
-														<hr>
-												<h2 style="text-align:center" > Full Hash </h2>
-														<p> <b> State Hash: </b>  {{ info[selected].stateHash}} </p>
-														<p> <b> Previous Hash: </b> {{ info[selected].previousBlockHash }} </p>
-														<hr>
-												<h2 style="text-align:center">Transaction Information</h2>
-												<h4>Total number of transactions: {{ info[selected].transactions.length }} </h4>
-													<div ng-repeat="transactions in info[selected].transactions">
-														<p style="text-align:center"> <b>Transaction#</b> {{ $index+1 }} </p>
-														<p> <b>ChaincodeID:</b> {{transactions.chaincodeID }}</p>
-														<p> <b>UUID:</b> {{ transactions.uuid }} </p>
-														<p> <b>Date:</b> {{ transactions.date }} </p>
-														<p> <b>Seconds:</b> {{ transactions.timestamp.seconds}} </p>
-														<p> <b>Nanos:</b> {{ transactions.timestamp.nanos}} </p>
-														<p> <b>Level:</b> {{ transactions.confidentialityLevel }} </p>
-														<p> <b>Payload:</b> {{ transactions.payload }} </p>
-														<p> <b>Nonce:</b> {{ transactions.nonce }} </p>
-														<p> <b>Cert:</b> {{ info.transactions.cert }} </p>
-														<p> <b>Signature:</b> {{ info.transactions.signature }} </p>
-														<hr>										
-													</div>			
-		 									</div>
-									</div>
-							</tr>
-						</tbody>
-					</table>
+							<button ng-click="Update_selected_block($index)"> View </button>
+							<form action='#openModal2' id="change2" style="display:none;>
+								 <input type="submit" value="Details">
+							</form>
+								<div id="openModal2" class="modalDialog" style="font-size: 120%; text-align:left;">
+								<div>
+									<a href="#close" title="Close" class="close">X</a>
+									<h2 style="text-align:center"> Extra Non Hash Data</h2>
+										<p> <b> Date: </b> {{ info[selected].nonHashData.localLedgerCommitTimestamp.date }} </p>
+										<p> <b> Seconds: </b> {{ info[selected].nonHashData.localLedgerCommitTimestamp.seconds}}	</p>
+										<p> <b> Nanos: </b> {{ info[selected].nonHashData.localLedgerCommitTimestamp.nanos}}	</p>
+										<p> <b> Consensus Metadata: </b> {{ info[selected].consensusMetadata}} </p>
+										<p> <b> Transaction Results: </b> {{ info[selected].nonHashData.transactionResults}}	</p>
+										<hr>
+									<h2 style="text-align:center" > Full Hash </h2>
+										<p> <b> State Hash: </b>  {{ info[selected].stateHash}} </p>
+										<p> <b> Previous Hash: </b> {{ info[selected].previousBlockHash }} </p>
+										<hr>
+									<h2 style="text-align:center">Transaction Information</h2>
+										<h4>Total number of transactions: {{ info[selected].transactions.length }} </h4>
+										<div ng-repeat="transactions in info[selected].transactions">
+											<p style="text-align:center"> <b>Transaction#</b> {{ $index+1 }} </p>
+											<p> <b>ChaincodeID:</b> {{transactions.chaincodeID }}</p>
+											<p> <b>UUID:</b> {{ transactions.uuid }} </p>
+											<p> <b>Date:</b> {{ transactions.date }} </p>
+											<p> <b>Seconds:</b> {{ transactions.timestamp.seconds}} </p>
+											<p> <b>Nanos:</b> {{ transactions.timestamp.nanos}} </p>
+											<p> <b>Level:</b> {{ transactions.confidentialityLevel }} </p>
+											<p> <b>Payload:</b> {{ transactions.payload }} </p>
+											<p> <b>Nonce:</b> {{ transactions.nonce }} </p>
+											<p> <b>Cert:</b> {{ transactions.cert }} </p>
+											<p> <b>Signature:</b> {{ transactions.signature }} </p>
+											<hr>										
+										</div>			
+		 						</div>
+							</div>
+						</tr>
+					</tbody>
+				</table>
 	</div>
 
 	<div id="current" class="Current" ng-controller="CURRENT">
