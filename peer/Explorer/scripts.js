@@ -532,7 +532,7 @@ App.controller("BLOCKS",
 					$scope.trans2[height-temp] = data.transactions;
 					count++;
 
-					// once all 10 GET requests are recieved, they will be but into one array that can then be easily displayed in the table
+					// once all 10 GET requests are recieved and correctly stored inorder in array, we turn off loading symbol, and proceed to get all transactions from recieved blocks
 					if(count == 10){
 						$scope.hideloader();
 						$scope.trans = [];
@@ -579,9 +579,9 @@ App.controller("TRANSACTIONS",
  		// controls number of rows to display in the table, initially set to 10
 		$scope.row_amount2 = 10;
 
-		/* used to display form with extra transaction information, onclick, selected2 is set to the $index of the table row, the displayed form knows
+		/* used to display form with extra transaction information, onclick, transaction_selected is set to the $index of the table row, the displayed form knows
 		which transaction information to display getElementById looking at this number*/
-		$scope.selected2 = 0;
+		$scope.transaction_selected = 0;
 
 		// loading icon, is displayed while data is loading
 		$scope.loader= {
@@ -598,8 +598,8 @@ App.controller("TRANSACTIONS",
  		});
 
  		// update seleted2 index and update form with corresponding transaction info
- 		$scope.ExecuteAll2 = function(x){
-			$scope.selected2 = x;
+ 		$scope.Update_transaction_selection_index = function(x){
+			$scope.transaction_selected = x;
 			document.forms["change3"].submit();
 		}
 })
