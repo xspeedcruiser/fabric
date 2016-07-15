@@ -116,64 +116,66 @@ App.controller("CURRENT",
 App.controller("SEARCH", 
 	function($scope, REST_SERVICE_TRANSACTIONS, REST_SERVICE_BLOCK2)
 	{
-	    $scope.search = function(){
-	    	$scope.found = 0;
+	    	$scope.search = function(){
+	    		$scope.found = 0;
 			// first we search by UUID
 			REST_SERVICE_TRANSACTIONS.getData($scope.response).then(function(data){
-
-					// convert transaction seconds to date 
-					var date = new Date(null);
-					date.setSeconds(data.timestamp.seconds);
-					data.date = date;
-										   
-					$scope.found = 1;
-		    		$scope.info = data;
+				$scope.info = data;
+				$scope.found = 1;
+	
+				// convert transaction seconds to date 
+				var date = new Date(null);
+				date.setSeconds(data.timestamp.seconds);
+				data.date = date;
+				
+				// updated variables for output						   
 		    		$scope.message = "Transaction succesfully found";
 		    		$scope.text1 = "Chaincode ID: " +$scope.info.chaincodeID;
 		    		$scope.text2 = "UUID: " +$scope.info.uuid;
 		    		$scope.text3 = "Seconds: " +$scope.info.timestamp.seconds;
 		    		$scope.text4 = "Nanos: " +$scope.info.timestamp.nanos;
-		    		$scope.text7 = "Date: " +$scope.info.date ;
 		    		$scope.text5 = null;
 		    		$scope.text6 = null;
+		    		$scope.text7 = "Date: " +$scope.info.date ;
 			});
-			// if nothing is found by uuid, we seach by block number
+			// Search by block number
 			REST_SERVICE_BLOCK2.getData($scope.response).then(function(data){
+				$scope.info = data;
+				$scope.found =1;
 
-						// convert from Seconds to date
+				// convert block timestamp
+				var date = new Date(null);
+				date.setSeconds(data.nonHashData.localLedgerCommitTimestamp.seconds);
+				date.toISOString().substr(11, 8);
+				data.nonHashData.localLedgerCommitTimestamp.date = date;
 
-						// convert block timestamp
-						var date = new Date(null);
-						date.setSeconds(data.nonHashData.localLedgerCommitTimestamp.seconds);
-						date.toISOString().substr(11, 8);
-						data.nonHashData.localLedgerCommitTimestamp.date = date;
+				//convert timestamps of all transactions on block
+				for(var k=0; k<data.transactions.length; k++){
+					var date2 = new Date(null);
+					date2.setSeconds(data.transactions[k].timestamp.seconds);
+					data.transactions[k].date = date2;
+				}
 
-						//convert timestamps of all transactions on block
-							for(var k=0; k<data.transactions.length; k++){
-								var date2 = new Date(null);
-								date2.setSeconds(data.transactions[k].timestamp.seconds);
-								data.transactions[k].date = date2;
-							}
-
-						$scope.found =1;
-						$scope.info = data;
-		    			$scope.message = "Block succsefully found";
-		    			$scope.text1 =  "StateHash: " + $scope.info.stateHash;
-		    			$scope.text2 =  "Previous Hash: " + $scope.info.previousBlockHash;
-		    			$scope.text3 =  "Consensus Meta: " + $scope.info.consensusMetadata;
-		    			$scope.text4 =  "Seconds: " + $scope.info.nonHashData.localLedgerCommitTimestamp.seconds;
-		    			$scope.text5 =  "Nanos: " + $scope.info.nonHashData.localLedgerCommitTimestamp.nanos;
-		    			$scope.text6 = null; // clear in to avoid displaying previous transaciton count if new block search has 0 
-		    			$scope.text6 = 	"Transactions: " + $scope.info.transactions.length;
-		    			$scope.text7 =  "Date: " + $scope.info.date;
-		    			if($scope.info.transactions.length != null){
-	     					document.getElementById("change").style.display = "block";
-	     				} else {
-	     					$scope.text6 = 0;	
-	     					document.getElementById("change").style.display = "none";
-	     				}
+		    		$scope.message = "Block succsefully found";
+		    		$scope.text1 =  "StateHash: " + $scope.info.stateHash;
+		    		$scope.text2 =  "Previous Hash: " + $scope.info.previousBlockHash;
+		    		$scope.text3 =  "Consensus Meta: " + $scope.info.consensusMetadata;
+		    		$scope.text4 =  "Seconds: " + $scope.info.nonHashData.localLedgerCommitTimestamp.seconds;
+		    		$scope.text5 =  "Nanos: " + $scope.info.nonHashData.localLedgerCommitTimestamp.nanos;
+		    		$scope.text6 = null; // clear in to avoid displaying previous transaciton count if new block search has 0 
+		    		$scope.text6 = 	"Transactions: " + $scope.info.transactions.length;
+		    		$scope.text7 =  "Date: " + $scope.info.date;
+		    		
+		    		// display "View Transactions" button at bottom of information panel
+		    		if($scope.info.transactions.length != null){
+	     				document.getElementById("change").style.display = "block";
+	     			} else {
+	     				$scope.text6 = 0;	
+	     				document.getElementById("change").style.display = "none";
+	     			}
 			});	
 
+			// if nothing is found searching by UUID or block number
 			if($scope.found == 0){
 				$scope.message = "no information found";
 				$scope.info = null;
@@ -186,33 +188,33 @@ App.controller("SEARCH",
 				$scope.text7 = null;
 				document.getElementById("change").style.display = "none";
 			}
-					//animate slideout only after the the information is ready to display
-					setTimeout(function(){ 
-		    			if(document.getElementById("panel").style.display != "none"){
-				   	    	// don't slide since already visible
-						} else{
-							$(document).ready(function(){
-							$("#panel").slideToggle(1000);});	
-							}}, 400);
+			
+			//animate slideout only after the the information is ready to display
+			setTimeout(function(){ 
+		    		if(document.getElementById("panel").style.display != "none"){
+				// don't slide since panel is already visible
+				} else{
+					$(document).ready(function(){
+					$("#panel").slideToggle(1000);});	
+				}}, 400);
 		};
-
 		$scope.clear = function(){
 			$scope.response = "";
 			if(document.getElementById("panel").style.display == "none"){
 				// already hidden, don't wan't to animate again
 				$scope.found= 0;
 				$scope.info = null;
-			    $scope.message = null;
-			    $scope.text1 =  null;
-			    $scope.text2 =  null;
-			    $scope.text3 =  null;
-			    $scope.text4 =  null;
-			    $scope.text5 =  null;
-			    scope.text6 = null; 
-			    $scope.text7 = null;
+			    	$scope.message = null;
+				$scope.text1 =  null;
+				$scope.text2 =  null;
+			    	$scope.text3 =  null;
+			    	$scope.text4 =  null;
+			    	$scope.text5 =  null;
+			    	$scope.text6 = null; 
+			    	$scope.text7 = null;
 			}
 			else{
-				// panel is visible, we need to hide it		
+				// panel is visible, we need to hide it, JQuery used for animation 	
 				$(document).ready(function(){
 					$("#panel").slideToggle(1000);		
 				});	
@@ -220,15 +222,15 @@ App.controller("SEARCH",
 				setTimeout(function(){ 
 					$scope.found = 0;
 					$scope.info = null;
-				    $scope.message = null;
-				    $scope.text1 =  null;
-				    $scope.text2 =  null;
-				    $scope.text3 =  null;
-				    $scope.text4 =  null;
-				    $scope.text5 =  null;
-				    $scope.text6 = null; 
-				    $scope.text7 = null;
-					}, 100);
+					$scope.message = null;
+					$scope.text1 =  null;
+					$scope.text2 =  null;
+					$scope.text3 =  null;
+					$scope.text4 =  null;
+					$scope.text5 =  null;
+					$scope.text6 = null; 
+					$scope.text7 = null;
+				}, 100);
 			}
 		}
 	}
@@ -238,8 +240,8 @@ App.controller("NETWORK",
 	function($scope, $http)
 	{
 		$http.get(REST_ENDPOINT.concat("/network/peers")).
-	    success(function(data)
-	     {$scope.info = data;} );
+	    	success(function(data)
+	     	{$scope.info = data;} );
 	}
 )
 
@@ -270,32 +272,29 @@ App.controller("GRAPH",
 	function($scope)
 	{
 		// TODO, just placeholders atm with no meaningful data
-				$scope.latency = 50;
-				$scope.capacity = "10.1K";
+		$scope.latency = 50;
+		$scope.capacity = "10.1K";
+		$scope.data_1= [10,20,30,40,60];
+		$scope.data_2= [100,40,20,90,60];
 
-				$scope.data = {
-					    Options: [
-					      {id: "1", name: "Option A"},
-					      {id: "2", name: "Option B"},
-					      {id: "3", name: "Option C"}
-					    ],
-					    selected: {id: "1", name: "Option A"}
-					};
-
-				$scope.data2 = {
-					    Options: [
-					      {id: "1", name: "Option A"},
-					      {id: "2", name: "Option B"},
-					      {id: "3", name: "Option C"}
-					    ],
-					    selected: {id: "1", name: "Option A"}
-					};
-
-			$scope.data_1= [10,20,30,40,60];
-			$scope.data_2= [100,40,20,90,60];	
+		$scope.data = {
+			Options: [
+				{id: "1", name: "Option A"},
+				{id: "2", name: "Option B"},
+				{id: "3", name: "Option C"}
+				],
+			selected: {id: "1", name: "Option A"}
+		};
+		$scope.data2 = {
+			Options: [
+				{id: "1", name: "Option A"},
+				{id: "2", name: "Option B"},
+				{id: "3", name: "Option C"}
+				],
+			selected: {id: "1", name: "Option A"}
+		};
 	}
 );
-
 
 App.controller("BAR_GRAPH", 
 	function($scope){
@@ -567,16 +566,16 @@ App.controller("BLOCKS",
 				$scope.info = new Array($scope.number_of_blocks_to_display);
 	
 				// will be used to keep track of most recent transactions, initially array of objects with transcations from each block, in the end concated to $scope.trans with a single transaction at each index
-			    $scope.trans2 = new Array($scope.number_of_blocks_to_display);
+				 $scope.trans2 = new Array($scope.number_of_blocks_to_display);
 
-			    // broadcast reciever get chain information from CURRENT controller that initially calls http request, once height is known, specific blocks begin to be retrieved in $scope.update()
+			    	// broadcast reciever get chain information from CURRENT controller that initially calls http request, once height is known, specific blocks begin to be retrieved in $scope.update()
 				$scope.$on("handle_broadcast",function(){
  					$scope.size = SHARE_INFORMATION.chain.height;
-      
-			       	if($scope.initial == 0){
+      					// if 0, then it's the initial startup of the controller, only run at the beggining once to get information
+			       		if($scope.initial == 0){
 			       			$scope.initial++;
 			       			$scope.update($scope.size-1);
-			       	}
+			       		}
  				});
 
 				// updates selected block number and displays form with transaction info based on selection
@@ -617,7 +616,7 @@ App.controller("TRANSACTIONS",
 			document.forms["change3"].submit();
 		}
 })
-// used to keep navigation menu displayed horizontally, runs whenever window resizes 
+// used to keep navigation menu displayed horizontally when resolution change from menu button to navigation bar, runs whenever window resizes 
 function restore() {
 	var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 	if(width > 600 ){
