@@ -48,13 +48,12 @@ App.factory("REST_SERVICE_BLOCK", function($http) {
 
 // http request to get block information by block#, used in search, doesn't add any metadata
 App.factory("REST_SERVICE_BLOCK2", function($http) {
-   return {
-     getData: function(chain_index) {
-       return $http.get(REST_ENDPOINT +"/chain/blocks/"+ chain_index).then(function(result) {   	
-           return result.data;
-       });
-   }
-}
+	return {
+		getData: function(chain_index) {
+			return $http.get(REST_ENDPOINT +"/chain/blocks/"+ chain_index).then(function(result) {   	
+				return result.data;
+			});
+		}}
 });
 
 // http request to get transaction information by UUID, used in search 
@@ -64,7 +63,7 @@ App.factory("REST_SERVICE_TRANSACTIONS", function($http){
 			return $http.get(REST_ENDPOINT+ "/transactions/"+ uuid).then(function(result){
 				return result.data;
 			});
-	}}
+		}}
 });
 
 /* factory to share information between controllers, the BLOCK controller gets the 10 most recent blocks, parses the information 
@@ -496,81 +495,81 @@ App.controller("TRIGGER",
 )
 
 App.controller("BLOCKS", 
-	function($scope, REST_SERVICE_BLOCK, REST_SERVICE_HEIGHT,SHARE_INFORMATION)
-	{
-			    // Used to update which block or transaction information should display once user chooses view or expand button from table
-			    $scope.selected = 0;
-			    $scope.initial = 0;
+	function($scope, REST_SERVICE_BLOCK, REST_SERVICE_HEIGHT,SHARE_INFORMATION){
+		// Used to update which block or transaction information should display once user chooses view or expand button from table
+		$scope.selected = 0;
+		$scope.initial = 0;
 
-			    $scope.loader= {
-			    	loading: true,
-			    };
-			    $scope.hideloader = function(){
-			    	$scope.loader.loading = false;
-			    }
+		$scope.loader= {
+			loading: true,
+		};
+		$scope.hideloader = function(){
+			$scope.loader.loading = false;
+		}
 
-				$scope.update = function(height){
-					var j = 0; 
-					var count = 0; // keep track of server responses number of responses from server 
-						for(var i=height; i>(height-$scope.info.length); i--){
-						  	 REST_SERVICE_BLOCK.getData(i,j).then(function(data) {
-						  	 					// executes after getData resolves with server response
+		$scope.update = function(height){
+			var j = 0; 
+			var count = 0; // keep track of server responses number of responses from server
+			
+			for(var i=height; i>(height-$scope.info.length); i--){
+				REST_SERVICE_BLOCK.getData(i,j).then(function(data) {
+					// executes after getData resolves with server response, 
+					var date = new Date(null);
+					date.setSeconds(data.nonHashData.localLedgerCommitTimestamp.seconds);
+					date.toISOString().substr(11, 8);
+					data.nonHashData.localLedgerCommitTimestamp.date = date;
+					// using the array index that we passed in previously and added as metadata, we use it to store it in the correct array index, avoids sorting when mulitple requests happen asynchronously
+					$scope.info[data.location] = data;
+					
+					for(var k=0; k<data.transactions.length; k++){
+						var date2 = new Date(null);
+						date2.setSeconds(data.transactions[k].timestamp.seconds);
+						data.transactions[k].date = date2;
+						data.transactions[k].origin = data.block_origin;
+					}
+					
+					var temp = data.block_origin;
+					$scope.trans2[height-temp] = data.transactions;
+					count++;
 
-						  	 					var date = new Date(null);
-											    date.setSeconds(data.nonHashData.localLedgerCommitTimestamp.seconds);
-											    date.toISOString().substr(11, 8);
-											    data.nonHashData.localLedgerCommitTimestamp.date = date;
-
-										   		$scope.info[data.location] = data;
-										   			for(var k=0; k<data.transactions.length; k++){
-										   				var date2 = new Date(null);
-											   			date2.setSeconds(data.transactions[k].timestamp.seconds);
-											   			data.transactions[k].date = date2;
-										   				data.transactions[k].origin = data.block_origin;
-										   			}
-										   		var temp = data.block_origin;
-										   		$scope.trans2[height-temp] = data.transactions;
-										   		count++;
-
-										   		// once all 10 GET requests are recieved, they will be but into one array that can then be easily displayed in the table
-										   		if(count == 10){
-										   			$scope.hideloader();
-										   			$scope.trans = [];
-													for(var i=0; i<$scope.trans2.length; i++){
-														$scope.trans = $scope.trans.concat($scope.trans2[i]);
-													}
-													// after all the block information is ready, $scope.range is initialized which is used in ng-repeat to itterate through all blocks, initialzed now to maintain smooth animation
-													$scope.range = [0,1,2,3,4,5,6,7,8,9];
-													// once all the transactions are loaded, then we broadcast the information to the Transaction controller that will use it to display the information
-													SHARE_INFORMATION.load_broadcast_transactions($scope.trans);
-										   		}
-							  		 });
-						j++;
-					}	
-				}
-				// array used to keep track of 10 most recent blocks, if more than 10 would like to be dislpayed at a time, change $scope.number_of_block_to_display and $scope.range in $scope.update()
-				$scope.number_of_blocks_to_display = 10;
-				$scope.info = new Array($scope.number_of_blocks_to_display);
+					// once all 10 GET requests are recieved, they will be but into one array that can then be easily displayed in the table
+					if(count == 10){
+						$scope.hideloader();
+						$scope.trans = [];
+						for(var i=0; i<$scope.trans2.length; i++){
+							$scope.trans = $scope.trans.concat($scope.trans2[i]);
+						}
+						// after all the block information is ready, $scope.range is initialized which is used in ng-repeat to itterate through all blocks, initialzed now to maintain smooth animation
+						$scope.range = [0,1,2,3,4,5,6,7,8,9];
+						// once all the transactions are loaded, then we broadcast the information to the Transaction controller that will use it to display the information
+						SHARE_INFORMATION.load_broadcast_transactions($scope.trans);
+						}
+				});
+				j++;
+		}}
+		
+		// array used to keep track of 10 most recent blocks, if more than 10 would like to be dislpayed at a time, change $scope.number_of_block_to_display and $scope.range in $scope.update()
+		$scope.number_of_blocks_to_display = 10;
+		$scope.info = new Array($scope.number_of_blocks_to_display);
 	
-				// will be used to keep track of most recent transactions, initially array of objects with transcations from each block, in the end concated to $scope.trans with a single transaction at each index
-				 $scope.trans2 = new Array($scope.number_of_blocks_to_display);
+		// will be used to keep track of most recent transactions, initially array of objects with transcations from each block, in the end concated to $scope.trans with a single transaction at each index
+		$scope.trans2 = new Array($scope.number_of_blocks_to_display);
 
-			    	// broadcast reciever get chain information from CURRENT controller that initially calls http request, once height is known, specific blocks begin to be retrieved in $scope.update()
-				$scope.$on("handle_broadcast",function(){
- 					$scope.size = SHARE_INFORMATION.chain.height;
-      					// if 0, then it's the initial startup of the controller, only run at the beggining once to get information
-			       		if($scope.initial == 0){
-			       			$scope.initial++;
-			       			$scope.update($scope.size-1);
-			       		}
- 				});
+		// broadcast reciever get chain information from CURRENT controller that initially calls http request, once height is known, specific blocks begin to be retrieved in $scope.update()
+		$scope.$on("handle_broadcast",function(){
+ 			$scope.size = SHARE_INFORMATION.chain.height;
+      			// if 0, then it's the initial startup of the controller, only run at the beggining once to get information
+			if($scope.initial == 0){
+				$scope.initial++;
+				$scope.update($scope.size-1);
+			}
+ 		});
 
-				// updates selected block number and displays form with transaction info based on selection
-				$scope.ExecuteAll = function(x){
-					$scope.selected = x;
-					document.forms["change2"].submit();
-				}
-
+		// updates selected block number and displays form with transaction info based on selection
+		$scope.ExecuteAll = function(x){
+			$scope.selected = x;
+			document.forms["change2"].submit();
+		}
 	}
 )
 App.controller("TRANSACTIONS",
