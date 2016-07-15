@@ -567,7 +567,7 @@ App.controller("BLOCKS",
  		});
 
 		// updates selected block number and displays form with transaction info based on selection
-		$scope.ExecuteAll = function(x){
+		$scope.Update_selected_block = function(x){
 			$scope.selected = x;
 			document.forms["change2"].submit();
 		}
