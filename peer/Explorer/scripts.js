@@ -533,7 +533,7 @@ App.controller("BLOCKS",
 					count++;
 
 					// once all 10 GET requests are recieved and correctly stored inorder in array, we turn off loading symbol, and proceed to get all transactions from recieved blocks
-					if(count == 10){
+					if(count == $scope.number_of_blocks_to_display){
 						$scope.hideloader();
 						$scope.trans = [];
 						for(var i=0; i<$scope.trans2.length; i++){
