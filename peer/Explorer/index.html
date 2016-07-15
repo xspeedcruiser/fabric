@@ -123,52 +123,52 @@ limitations under the License.-->
 	</div>
 
 	<div id="search" class="Search" ng-controller="SEARCH">
-	<a name="C"></a>
+		<a name="C"></a>
 			<div  class="Block_title">
 				<h1>Search</h1>
 			</div>
 			<div class="Search_top">
-					 <input type = "text" ng-model="response" placeholder= "UUID/Block number">	
-					 <button id="flip" ng-click="search()"> Search </button>
-					 <button ng-click="clear()"> Clear </button>
+				<input type = "text" ng-model="response" placeholder= "UUID/Block number">	
+				<button id="flip" ng-click="search()"> Search </button>
+				<button ng-click="clear()"> Clear </button>
 			</div>
-				<div id="panel" class="Panel" style="display:none">			 	
-					<div class="Results">
-						 <p> {{ message }} </p>	
-						 <p> {{ text1 }} </p>
-						 <p> {{ text2 }} </p>
-						 <p> {{ text3 }} </p>
-						 <p> {{ text4 }} </p>
-						 <p> {{ text5 }} </p>
-						 <p> {{ text6 }} </p>
-						 <p> {{ text7 }} </p>
-					</div>
-
-					<form action='#openModal' id="change" style="display:none;" class="Results_button">
-						 <input class="Submit" type="submit" value="View Transaction Details">
-					</form>
+			<div id="panel" class="Panel" style="display:none">			 	
+				<div class="Results">
+					<p> {{ message }} </p>	
+					<p> {{ text1 }} </p>
+					<p> {{ text2 }} </p>
+					<p> {{ text3 }} </p>
+					<p> {{ text4 }} </p>
+					<p> {{ text5 }} </p>
+					<p> {{ text6 }} </p>
+					<p> {{ text7 }} </p>
 				</div>
-									<div id="openModal" class="modalDialog" style="font-size: 120%; text-align:left;">
-											<div>
-												<a href="#close" title="Close" class="close">X</a>
-												<h2 style="text-align:center">Transaction Information</h2>
-												<h4>Total number of transactions: {{ info.transactions.length }} </h4>
-													<div ng-repeat="transactions in info.transactions">
-														<p style="text-align:center"> <b>Transaction#</b> {{ $index+1 }} </p>
-														<p> <b>ChaincodeID:</b> {{transactions.chaincodeID }}</p>
-														<p> <b>UUID:</b> {{ transactions.uuid }} </p>
-														<p> <b>Date: </b> {{ transactions.date}} </p>
-														<p> <b>Seconds:</b> {{ transactions.timestamp.seconds}} </p>
-														<p> <b>Nanos:</b> {{ transactions.timestamp.nanos}} </p>
-														<p> <b>Level:</b> {{ transactions.confidentialityLevel }} </p>
-														<p> <b>Payload:</b> {{ transactions.payload }} </p>
-														<p> <b>Nonce:</b> {{ transactions.nonce }} </p>
-														<p> <b>Cert:</b> {{ info.transactions.cert }} </p>
-														<p> <b>Signature:</b> {{ info.transactions.signature }} </p>
-														<hr>										
-													</div>			
-											</div>
+				<form action='#openModal' id="change" style="display:none;" class="Results_button">
+					<input class="Submit" type="submit" value="View Transaction Details">
+				</form>
+			</div>
+			
+			<div id="openModal" class="modalDialog" style="font-size: 120%; text-align:left;">
+				<div>
+					<a href="#close" title="Close" class="close">X</a>
+					<h2 style="text-align:center">Transaction Information</h2>
+						<h4>Total number of transactions: {{ info.transactions.length }} </h4>
+						<div ng-repeat="transactions in info.transactions">
+							<p style="text-align:center"> <b>Transaction#</b> {{ $index+1 }} </p>
+							<p> <b>ChaincodeID:</b> {{transactions.chaincodeID }}</p>
+							<p> <b>UUID:</b> {{ transactions.uuid }} </p>
+							<p> <b>Date: </b> {{ transactions.date}} </p>
+							<p> <b>Seconds:</b> {{ transactions.timestamp.seconds}} </p>
+							<p> <b>Nanos:</b> {{ transactions.timestamp.nanos}} </p>
+							<p> <b>Level:</b> {{ transactions.confidentialityLevel }} </p>
+							<p> <b>Payload:</b> {{ transactions.payload }} </p>
+							<p> <b>Nonce:</b> {{ transactions.nonce }} </p>
+							<p> <b>Cert:</b> {{ info.transactions.cert }} </p>
+							<p> <b>Signature:</b> {{ info.transactions.signature }} </p>
+							<hr>										
+						</div>			
 				</div>
+			</div>
 	</div>
 
 	<div id="network" class="Network" ng-controller="NETWORK">
@@ -180,24 +180,24 @@ limitations under the License.-->
 			<p style="padding-left:20px;">Number of Peers connected to Network:  {{ info.peers.length}}</p>
 			<div class="Network_child">
 				<table>												
-						<thead>	
-							<tr>
-								<th> Name </th>
-								<th> Address</th>
-								<th> Type</th>
-								<th> PKIID</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="peers in info.peers ">
-								<td data-label="Name"> {{info.peers[$index].ID.name}} </td>
-								<td data-label="Address"> {{info.peers[$index].address }}  </td>
-								<td data-label="Type"> {{info.peers[$index].type}} </td>
-								<td data-label="PKIID"> {{info.peers[$index].pkiID}} </td>
-							</tr>
-						</tbody>
-			</table>
-		</div>
+					<thead>	
+						<tr>
+							<th> Name </th>
+							<th> Address</th>
+							<th> Type</th>
+							<th> PKIID</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="peers in info.peers ">
+							<td data-label="Name"> {{info.peers[$index].ID.name}} </td>
+							<td data-label="Address"> {{info.peers[$index].address }}  </td>
+							<td data-label="Type"> {{info.peers[$index].type}} </td>
+							<td data-label="PKIID"> {{info.peers[$index].pkiID}} </td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 	</div>
 
 
