@@ -45,12 +45,12 @@ public class RepoChain extends ChaincodeBase {
 
                 break;
             case "instruct":
-                if (args.length < 7) {
+                if (args.length < 8) {
                     log.error("Not enough args for instruct, return error");
                     return "Error: Not enough args for instruct, return error";
                 } else {
                     log.info("Trade instruct");
-                    String xref, tid, partID, contraID;
+                    String xref, tid, partID, contraID, cusip;
                     float repoRate, startAmount;
                     int par;
                     xref = args[0];
@@ -60,12 +60,23 @@ public class RepoChain extends ChaincodeBase {
                     repoRate = Float.parseFloat(args[4]);
                     startAmount = Float.parseFloat(args[5]);
                     par = Integer.parseInt(args[6]);
-                    RepoContract repoObj = new RepoContract(xref, tid, partID, contraID, repoRate, startAmount, par);
+                    cusip = args[7];
+                    RepoContract repoObj = new RepoContract(xref, tid, partID, contraID, cusip, repoRate, startAmount, par);
                     log.info("Trade instruct with -" + repoObj);
                     stub.putRawState("~" + repoObj.getKey(), ByteString.copyFrom(repoObj.toByteArr()));
                     matchRepo(stub, repoObj);
                 }
                 break;
+            case "deltrades":
+                Map<String, ByteString> allTrades = null;
+                // query for only unmatched trades identified by the ~ prefix in the key
+                allTrades = stub.rangeQueryRawState("", "");
+                for (String key:allTrades.keySet()) {
+                    stub.delState(key);
+                }
+                break;
+
+
         }
         return null;
     }
@@ -82,7 +93,7 @@ public class RepoChain extends ChaincodeBase {
 
         for (Map.Entry<String, ByteString> repoIter : unMatchedTrades.entrySet()) {
             RepoContract iterTrade = RepoContract.toRepoObj(repoIter.getValue().toByteArray());
-            if (newTrade.match(iterTrade)) {
+            if  (!iterTrade.isMatched() && newTrade.match(iterTrade)) {
                 log.info("Matched trade with key " + newTrade.getKey() + "-" + iterTrade.getKey());
                 iterTrade.setMatched();
                 newTrade.setMatched();
@@ -147,7 +158,8 @@ public class RepoChain extends ChaincodeBase {
     }
 
     public String init(ChaincodeStub stub, String function, String[] args) {
-        stub.putState("init", "init");
+        //stub.putState("init", "init");
+        log.info("Inside init");
         return null;
     }
 

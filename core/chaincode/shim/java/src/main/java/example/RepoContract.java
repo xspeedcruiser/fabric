@@ -90,7 +90,7 @@ public class RepoContract implements Serializable{
         this.par = par;
     }
 
-    private String xref, tid, partID, contraID;
+    private String xref, tid, partID, contraID, cusip;
     private float repoRate, startAmount;
     private int par;
     private boolean matched;
@@ -125,10 +125,32 @@ public class RepoContract implements Serializable{
         if (getPar() != that.getPar()) return false;
         if (!getXref().equals(that.getXref())) return false;
         if (!getTid().equals(that.getTid())) return false;
+        if (!getCusip().equals(that.getCusip())) return false;
         if (!getPartID().equals(that.getPartID())) return false;
         return getContraID().equals(that.getContraID());
 
     }
+
+    public String getCusip() {
+        return cusip;
+    }
+
+    public void setCusip(String cusip) {
+        this.cusip = cusip;
+    }
+
+    public RepoContract(String xref, String tid, String partID, String contraID, String cusip, float repoRate, float startAmount, int par) {
+        this.xref = xref;
+        this.tid = tid;
+        this.partID = partID;
+        this.contraID = contraID;
+        this.cusip = cusip;
+        this.repoRate = repoRate;
+        this.startAmount = startAmount;
+        this.par = par;
+    }
+
+
     public boolean match(RepoContract o) {
         if (this == o) return true;
 
@@ -137,6 +159,7 @@ public class RepoContract implements Serializable{
         if (Float.compare(that.getRepoRate(), getRepoRate()) != 0) return false;
         if (Float.compare(that.getStartAmount(), getStartAmount()) != 0) return false;
         if (getPar() != that.getPar()) return false;
+        if (!getCusip().equals(that.getCusip())) return false;
         if (!getPartID().equals(that.getContraID())) return false;
         return getContraID().equals(that.getPartID());
     }
@@ -148,6 +171,7 @@ public class RepoContract implements Serializable{
                 ", tid='" + tid + '\'' +
                 ", partID='" + partID + '\'' +
                 ", contraID='" + contraID + '\'' +
+                ", cusip='" + cusip + '\'' +
                 ", repoRate=" + repoRate +
                 ", startAmount=" + startAmount +
                 ", par=" + par +
