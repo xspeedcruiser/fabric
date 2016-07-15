@@ -300,7 +300,7 @@ limitations under the License.-->
 								<td data-label="UUID">{{ trans[$index].uuid | limitTo : 13}}...</td>
 								<td data-label="Details">
 
-										<button ng-click="ExecuteAll2($index)"> Expand </button>
+										<button ng-click="Update_transaction_selection_index($index)"> Expand </button>
 									<form action='#openModal3' id="change3" style="display:none">
 										<input type="submit" value="Full Details">
 									</form>
@@ -312,16 +312,16 @@ limitations under the License.-->
 												<a href="#close" title="Close" class="close">X</a>
 												<h2 style="text-align:center" >Transaction Information</h2>	
 													<div>
-														<p> <b>Type:</b> {{trans[selected2].type }}</p>
-														<p> <b>ID:</b> {{ trans[selected2].chaincodeID }} </p>
-														<p> <b>Date: </b> {{ trans[selected2].date }} </p>
-														<p> <b>Seconds:</b> {{ trans[selected2].timestamp.seconds}} </p>
-														<p> <b>Nanos:</b> {{ trans[selected2].timestamp.nanos}} </p>
-														<p> <b>UUID:</b> {{ trans[selected2].uuid }} </p>
-														<p> <b>Payload:</b> {{ trans[selected2].payload }} </p>
-														<p> <b>Confidence Level:</b> {{ trans[selected2].confidentialityLevel }} </p>
-														<p> <b>Cert:</b> {{ trans[selected2].cert }} </p>
-														<p> <b>Signature:</b> {{ info.transactions.signature }} </p>
+														<p> <b>Type:</b> {{trans[transaction_selected].type }}</p>
+														<p> <b>ID:</b> {{ trans[transaction_selected].chaincodeID }} </p>
+														<p> <b>Date: </b> {{ trans[transaction_selected].date }} </p>
+														<p> <b>Seconds:</b> {{ trans[transaction_selected].timestamp.seconds}} </p>
+														<p> <b>Nanos:</b> {{ trans[transaction_selected].timestamp.nanos}} </p>
+														<p> <b>UUID:</b> {{ trans[transaction_selected].uuid }} </p>
+														<p> <b>Payload:</b> {{ trans[transaction_selected].payload }} </p>
+														<p> <b>Confidence Level:</b> {{ trans[transaction_selected].confidentialityLevel }} </p>
+														<p> <b>Cert:</b> {{ trans[transaction_selected].cert }} </p>
+														<p> <b>Signature:</b> {{ trans[transaction_selected].signature }} </p>
 														<hr>										
 													</div>			
 											</div>
