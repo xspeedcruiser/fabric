@@ -508,11 +508,11 @@ App.controller("BLOCKS",
 		}
 
 		$scope.update = function(height){
-			var j = 0; 
-			var count = 0; // keep track of server responses number of responses from server
+			var array_location = 0; // array location server response must be stored at
+			var count = 0; // number of responses returned from server
 			
-			for(var i=height; i>(height-$scope.info.length); i--){
-				REST_SERVICE_BLOCK.getData(i,j).then(function(data) {
+			for(var chain_index = height; chain_index>(height-$scope.info.length); chain_index--){
+				REST_SERVICE_BLOCK.getData(chain_index,array_location).then(function(data) {
 					// executes after getData resolves with server response, 
 					var date = new Date(null);
 					date.setSeconds(data.nonHashData.localLedgerCommitTimestamp.seconds);
@@ -545,8 +545,9 @@ App.controller("BLOCKS",
 						SHARE_INFORMATION.load_broadcast_transactions($scope.trans);
 						}
 				});
-				j++;
-		}}
+				array_location++;
+			}
+		}
 		
 		// array used to keep track of 10 most recent blocks, if more than 10 would like to be dislpayed at a time, change $scope.number_of_block_to_display and $scope.range in $scope.update()
 		$scope.number_of_blocks_to_display = 10;
