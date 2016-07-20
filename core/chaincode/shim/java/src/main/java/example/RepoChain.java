@@ -1,4 +1,4 @@
-/*
+ /*
  *
  * Copyright DTCC 2016 All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -141,7 +141,7 @@ public class RepoChain extends ChaincodeBase {
                             log.info("Failed to serialize for key " + repoIter.getKey());
                             continue;
                         }
-                        sb.append(iterTrade.toString() + "\n");
+                        sb.append("==> "+iterTrade.toString() + "\n");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
