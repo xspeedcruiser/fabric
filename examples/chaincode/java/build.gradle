@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+
 buildscript {
 	repositories {
 		mavenLocal()
@@ -36,8 +37,9 @@ task printClasspath {
     }
 }
 
-
-mainClassName = "example.SimpleSample"
+applicationName="examples"
+archivesBaseName = "java-examples"
+mainClassName = "example.Example"
 
 run {
 	if (project.hasProperty("appArgs")) {
@@ -54,20 +56,47 @@ sourceSets {
 }
 
 repositories {
-	mavenLocal()
+    mavenLocal()
     mavenCentral()
 }
 
-task copyChaincodeJar(type: Copy) {
-          from files( new File("${projectDir}/../../../core/chaincode/shim/java/build/libs/chaincode-1.0.jar"))
-          into "${projectDir}/build/libs"
+distZip {
+  destinationDir = file("${projectDir}")
+  archiveName="examples.zip"
+  duplicatesStrategy='exclude'
 }
 
+task createMoreZips(type: Copy, dependsOn: distZip){
+ from "${projectDir}"
+ into "${projectDir}"
+ include "examples.zip"
+ rename ("examples.zip","simplesample.zip")
+}
+distZip.finalizedBy(createMoreZips)
+
+task createAllStartScripts(type: CreateStartScripts) << {
+//just a placeholder
+}
+
+def scripts= ['runSimpleSample': 'example.SimpleSample', 'runMapExample':'example.MapExample', 'runLinkExample':'example.LinkExample' ]
+scripts.each() { scriptName, className -> def t = tasks.create(name: scriptName, type: CreateStartScripts) {
+  mainClassName=className
+  applicationName=scriptName
+  outputDir=new File (project.buildDir,'scripts1')
+  classpath=jar.outputs.files + project.configurations.runtime
+}
+
+applicationDistribution.into("bin") {
+ from(t)
+ fileMode=0755
+}
+createAllStartScripts.dependsOn(t)
+
+}
 
 dependencies {
 	compile 'io.grpc:grpc-all:0.13.2'
 	compile 'commons-cli:commons-cli:1.3.1'
         compile project(':core:chaincode:shim:java')
-        //compile files("build/libs/chaincode-1.0.jar")
         }
 //assemble.dependsOn copyChaincodeJar
