@@ -29,16 +29,9 @@ plugins {
 	id "java"
 	id "com.google.protobuf" version "0.7.6"
 	id "eclipse"
-	id "application"
 }
-
-mainClassName = "example.SimpleSample"
-
-run {
-	if (project.hasProperty("appArgs")) {
-		args = Eval.me(appArgs)
-	}
-}
+archivesBaseName = 'chaincode'
+version = '1.0'
 
 sourceSets {
 	main {

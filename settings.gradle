@@ -1,0 +1,2 @@
+include ":core:chaincode:shim:java"
+include ":examples:chaincode:java"

@@ -1,0 +1,102 @@
+/*
+Copyright DTCC 2016 All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+buildscript {
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		jcenter()
+	}
+}
+
+	
+plugins {
+	id "java"
+	id "eclipse"
+	id "application"
+}
+
+
+task printClasspath {
+    doLast {
+        configurations.testRuntime.each { println it }
+    }
+}
+
+applicationName="examples"
+archivesBaseName = "java-examples"
+mainClassName = "example.Example"
+
+run {
+	if (project.hasProperty("appArgs")) {
+		args = Eval.me(appArgs)
+	}
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src/main/java'
+		}
+	}
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+distZip {
+  destinationDir = file("${projectDir}")
+  archiveName="examples.zip"
+  duplicatesStrategy='exclude'
+}
+
+task createMoreZips(type: Copy, dependsOn: distZip){
+ from "${projectDir}"
+ into "${projectDir}"
+ include "examples.zip"
+ rename ("examples.zip","simplesample.zip")
+}
+distZip.finalizedBy(createMoreZips)
+
+task createAllStartScripts(type: CreateStartScripts) << {
+//just a placeholder
+}
+
+def scripts= ['runSimpleSample': 'example.SimpleSample', 'runMapExample':'example.MapExample', 'runLinkExample':'example.LinkExample' ]
+scripts.each() { scriptName, className -> def t = tasks.create(name: scriptName, type: CreateStartScripts) {
+  mainClassName=className
+  applicationName=scriptName
+  outputDir=new File (project.buildDir,'scripts1')
+  classpath=jar.outputs.files + project.configurations.runtime
+}
+
+applicationDistribution.into("bin") {
+ from(t)
+ fileMode=0755
+}
+createAllStartScripts.dependsOn(t)
+
+}
+
+dependencies {
+	compile 'io.grpc:grpc-all:0.13.2'
+	compile 'commons-cli:commons-cli:1.3.1'
+        compile project(':core:chaincode:shim:java')
+        }
+//assemble.dependsOn copyChaincodeJar
