@@ -54,7 +54,7 @@ BASEIMAGE_RELEASE = $(shell cat ./images/base/release)
 BASEIMAGE_DEPS    = $(shell git ls-files images/base scripts/provision)
 
 PROJECT_FILES = $(shell git ls-files)
-IMAGES = base src ccenv peer membersrvc
+IMAGES = base src ccenv peer membersrvc javaenv
 
 all: peer membersrvc checks
 
@@ -128,9 +128,9 @@ build/docker/bin/%: build/image/src/.dummy $(PROJECT_FILES)
 build/bin:
 	mkdir -p $@
 
-# Both peer and peer-image depend on ccenv-image
-build/bin/peer: build/image/ccenv/.dummy
-build/image/peer/.dummy: build/image/ccenv/.dummy
+# Both peer and peer-image depend on ccenv-image and javaenv-image (all docker env images it supports)
+build/bin/peer: build/image/ccenv/.dummy build/image/javaenv/.dummy
+build/image/peer/.dummy: build/image/ccenv/.dummy build/image/javaenv/.dummy
 build/image/peer/.dummy: build/docker/bin/examples/events/block-listener/
 
 build/bin/%: build/image/base/.dummy $(PROJECT_FILES)
@@ -161,6 +161,14 @@ build/image/ccenv/.dummy: build/image/src/.dummy build/image/ccenv/bin/protoc-ge
 	@echo "Building docker ccenv-image"
 	@cat images/ccenv/Dockerfile.in > $(@D)/Dockerfile
 	docker build -t $(PROJECT_NAME)-ccenv:latest $(@D)
+	@touch $@
+
+# Special override for java-image 
+build/image/javaenv/.dummy: Makefile
+	@echo "Building docker javaenv-image"
+	@mkdir -p $(@D)
+	@cat images/javaenv/Dockerfile.in > $(@D)/Dockerfile
+	docker build -t $(PROJECT_NAME)-javaenv:latest $(@D)
 	@touch $@
 
 # Default rule for image creation
