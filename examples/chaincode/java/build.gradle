@@ -37,9 +37,8 @@ task printClasspath {
     }
 }
 
-applicationName="examples"
-archivesBaseName = "java-examples"
-mainClassName = "example.SimpleSample"
+archivesBaseName = "java-example"
+mainClassName=System.getProperty("mainClassName")
 
 run {
 	if (project.hasProperty("appArgs")) {
@@ -51,6 +50,7 @@ sourceSets {
 	main {
 		java {
 			srcDir 'src/main/java'
+                        include '**/'+System.getProperty("baseName")+'.java'
 		}
 	}
 }
@@ -60,50 +60,20 @@ repositories {
     mavenCentral()
 }
 
-task createStartScripts(type: CreateStartScripts) {
-  outputDir = file('build/sample')
-  mainClassName = 'example.SimpleSample'
-  applicationName = 'javaChaincode'
-  //classpath = files('')
+
+distZip {
+  destinationDir = file("${projectDir}")
+  archiveName=System.getProperty("baseName")+'.zip'
+  duplicatesStrategy='exclude'
 }
 
-// distZip {
-//   destinationDir = file("${projectDir}")
-//   archiveName="examples.zip"
-//   duplicatesStrategy='exclude'
-// }
-
-task createMoreZips(type: Copy, dependsOn: distZip){
- from "${projectDir}"
- into "${projectDir}"
- include "examples.zip"
- rename ("examples.zip","simplesample.zip")
+startScripts{
+ applicationName='run'+System.getProperty("baseName")
 }
-//distZip.finalizedBy(createMoreZips)
 
-// task createAllStartScripts(type: CreateStartScripts) << {
-// //just a placeholder
-// }
-
-// def scripts= ['runSimpleSample': 'example.SimpleSample', 'runMapExample':'example.MapExample', 'runLinkExample':'example.LinkExample' ]
-// scripts.each() { scriptName, className -> def t = tasks.create(name: scriptName, type: CreateStartScripts) {
-//   mainClassName=className
-//   applicationName=scriptName
-//   outputDir=new File (project.buildDir,'scripts1')
-//   classpath=jar.outputs.files + project.configurations.runtime
-// }
-
-// applicationDistribution.into("bin") {
-//  from(t)
-//  fileMode=0755
-// }
-// createAllStartScripts.dependsOn(t)
-
-// }
 
 dependencies {
 	compile 'io.grpc:grpc-all:0.13.2'
 	compile 'commons-cli:commons-cli:1.3.1'
         compile project(':core:chaincode:shim:java')
         }
-//assemble.dependsOn copyChaincodeJar
