@@ -33,6 +33,7 @@ plugins {
 archivesBaseName = 'chaincode'
 version = '1.0'
 
+
 sourceSets {
 	main {
 		java {
@@ -74,6 +75,13 @@ protobuf {
 		}
 	}
 }
+
+task copyToLib(type: Copy) {
+    into "$buildDir/libs"
+    from configurations.runtime
+}
+
+build.finalizedBy(copyToLib)
 
 dependencies {
 	compile 'com.google.protobuf:protobuf-java:3.0.0-beta-2'

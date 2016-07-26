@@ -53,9 +53,10 @@ SUBDIRS:=$(strip $(SUBDIRS))
 BASEIMAGE_RELEASE = $(shell cat ./images/base/release)
 BASEIMAGE_DEPS    = $(shell git ls-files images/base scripts/provision)
 
+JAVASHIM_DEPS =  $(shell git ls-files core/chaincode/shim/java)
 PROJECT_FILES = $(shell git ls-files)
-IMAGES = base src ccenv peer membersrvc javaenv
-
+#IMAGES = base src ccenv peer membersrvc javaenv
+IMAGES = javaenv
 all: peer membersrvc checks
 
 checks: linter unit-test behave
@@ -76,7 +77,7 @@ unit-test: peer-image gotools
 	@./scripts/goUnitTests.sh
 
 .PHONY: images
-images: $(patsubst %,build/image/%/.dummy, $(IMAGES))
+images: $(patsubst	 %,build/image/%/.dummy, $(IMAGES))
 
 behave-deps: images peer
 behave: behave-deps
@@ -164,9 +165,10 @@ build/image/ccenv/.dummy: build/image/src/.dummy build/image/ccenv/bin/protoc-ge
 	@touch $@
 
 # Special override for java-image 
-build/image/javaenv/.dummy: Makefile
+build/image/javaenv/.dummy: Makefile $(JAVASHIM_DEPS)
 	@echo "Building docker javaenv-image"
-	@mkdir -p $(@D)
+	@mkdir -p $(@D)/libs
+	@./core/chaincode/shim/java/javabuild.sh $(@D) 
 	@cat images/javaenv/Dockerfile.in > $(@D)/Dockerfile
 	docker build -t $(PROJECT_NAME)-javaenv:latest $(@D)
 	@touch $@

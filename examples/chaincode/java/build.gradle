@@ -39,7 +39,7 @@ task printClasspath {
 
 applicationName="examples"
 archivesBaseName = "java-examples"
-mainClassName = "example.Example"
+mainClassName = "example.SimpleSample"
 
 run {
 	if (project.hasProperty("appArgs")) {
@@ -60,11 +60,18 @@ repositories {
     mavenCentral()
 }
 
-distZip {
-  destinationDir = file("${projectDir}")
-  archiveName="examples.zip"
-  duplicatesStrategy='exclude'
+task createStartScripts(type: CreateStartScripts) {
+  outputDir = file('build/sample')
+  mainClassName = 'example.SimpleSample'
+  applicationName = 'javaChaincode'
+  //classpath = files('')
 }
+
+// distZip {
+//   destinationDir = file("${projectDir}")
+//   archiveName="examples.zip"
+//   duplicatesStrategy='exclude'
+// }
 
 task createMoreZips(type: Copy, dependsOn: distZip){
  from "${projectDir}"
@@ -72,27 +79,27 @@ task createMoreZips(type: Copy, dependsOn: distZip){
  include "examples.zip"
  rename ("examples.zip","simplesample.zip")
 }
-distZip.finalizedBy(createMoreZips)
+//distZip.finalizedBy(createMoreZips)
 
-task createAllStartScripts(type: CreateStartScripts) << {
-//just a placeholder
-}
+// task createAllStartScripts(type: CreateStartScripts) << {
+// //just a placeholder
+// }
 
-def scripts= ['runSimpleSample': 'example.SimpleSample', 'runMapExample':'example.MapExample', 'runLinkExample':'example.LinkExample' ]
-scripts.each() { scriptName, className -> def t = tasks.create(name: scriptName, type: CreateStartScripts) {
-  mainClassName=className
-  applicationName=scriptName
-  outputDir=new File (project.buildDir,'scripts1')
-  classpath=jar.outputs.files + project.configurations.runtime
-}
+// def scripts= ['runSimpleSample': 'example.SimpleSample', 'runMapExample':'example.MapExample', 'runLinkExample':'example.LinkExample' ]
+// scripts.each() { scriptName, className -> def t = tasks.create(name: scriptName, type: CreateStartScripts) {
+//   mainClassName=className
+//   applicationName=scriptName
+//   outputDir=new File (project.buildDir,'scripts1')
+//   classpath=jar.outputs.files + project.configurations.runtime
+// }
 
-applicationDistribution.into("bin") {
- from(t)
- fileMode=0755
-}
-createAllStartScripts.dependsOn(t)
+// applicationDistribution.into("bin") {
+//  from(t)
+//  fileMode=0755
+// }
+// createAllStartScripts.dependsOn(t)
 
-}
+// }
 
 dependencies {
 	compile 'io.grpc:grpc-all:0.13.2'
