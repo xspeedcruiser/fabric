@@ -55,8 +55,7 @@ BASEIMAGE_DEPS    = $(shell git ls-files images/base scripts/provision)
 
 JAVASHIM_DEPS =  $(shell git ls-files core/chaincode/shim/java)
 PROJECT_FILES = $(shell git ls-files)
-#IMAGES = base src ccenv peer membersrvc javaenv
-IMAGES = javaenv
+IMAGES = base src ccenv peer membersrvc javaenv
 all: peer membersrvc checks
 
 checks: linter unit-test behave
