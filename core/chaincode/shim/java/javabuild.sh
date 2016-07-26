@@ -16,8 +16,8 @@
 #limitations under the License.
 #
 #
-#gradle clean
-#gradle build
+gradle clean
+gradle build
 PARENTDIR=$(pwd)
 DOCKER_CONTEXT=${1}
 cp ${PARENTDIR}/core/chaincode/shim/java/build/libs/*.jar ${PARENTDIR}/${DOCKER_CONTEXT}/libs
