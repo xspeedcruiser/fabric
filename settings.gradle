@@ -1,2 +1,5 @@
 include ":core:chaincode:shim:java"
-include ":examples:chaincode:java"
+include ":examples:chaincode:java:Example"
+include ":examples:chaincode:java:MapExample"
+include ":examples:chaincode:java:LinkExample"
+include ":examples:chaincode:java:SimpleSample"
