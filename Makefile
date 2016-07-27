@@ -35,6 +35,7 @@
 #   - node-sdk-unit-tests - runs the node.js client sdk unit tests
 #   - clean - cleans the build area
 #   - dist-clean - superset of 'clean' that also removes persistent state
+#	- javashim - Runs a gradle build on java shim layer
 
 PROJECT_NAME=hyperledger/fabric
 PKGNAME = github.com/$(PROJECT_NAME)
@@ -56,6 +57,7 @@ BASEIMAGE_DEPS    = $(shell git ls-files images/base scripts/provision)
 JAVASHIM_DEPS =  $(shell git ls-files core/chaincode/shim/java)
 PROJECT_FILES = $(shell git ls-files)
 IMAGES = base src ccenv peer membersrvc javaenv
+
 all: peer membersrvc checks
 
 checks: linter unit-test behave
@@ -164,10 +166,10 @@ build/image/ccenv/.dummy: build/image/src/.dummy build/image/ccenv/bin/protoc-ge
 	@touch $@
 
 # Special override for java-image 
-build/image/javaenv/.dummy: Makefile $(JAVASHIM_DEPS)
+build/image/javaenv/.dummy: Makefile javashim
 	@echo "Building docker javaenv-image"
 	@mkdir -p $(@D)/libs
-	@./core/chaincode/shim/java/javabuild.sh $(@D) 
+	@cp core/chaincode/shim/java/build/libs/*.jar $(@D)/libs
 	@cat images/javaenv/Dockerfile.in > $(@D)/Dockerfile
 	docker build -t $(PROJECT_NAME)-javaenv:latest $(@D)
 	@touch $@
@@ -194,6 +196,12 @@ base-image-clean:
 	$(eval TARGET = ${patsubst %-image-clean,%,${@}})
 	-docker rmi -f $(PROJECT_NAME)-$(TARGET)
 	-@rm -rf build/image/$(TARGET) ||:
+	
+. PHONY: javashim
+javashim: $(JAVASHIM_DEPS)
+	@echo "Building java shim layer"
+	@./core/chaincode/shim/java/javabuild.sh
+
 
 images-clean: $(patsubst %,%-image-clean, $(IMAGES))
 
