@@ -61,6 +61,8 @@ import protos.Chaincode.ChaincodeMessage;
 import protos.Chaincode.ChaincodeMessage.Builder;
 import protos.Chaincode.ChaincodeSpec;
 import protos.Chaincode.PutStateInfo;
+import protos.Chaincode.RangeQueryStateResponse;
+import protos.Chaincode.RangeQueryState;
 
 public class Handler {
 
@@ -688,80 +690,79 @@ public class Handler {
 		}
 	}
 
-//	public RangeQueryStateResponse handleRangeQueryState(String startKey, String endKey, int limit, String uuid) {
-//		// Create the channel on which to communicate the response from validating peer
-//		Channel<ChaincodeMessage> responseChannel;
-//		try {
-//			responseChannel = createChannel(uuid);
-//		} catch (Exception e) {
-//			logger.debug(String.format("[%s]Another state request pending for this Uuid."
-//					+ " Cannot process.", shortUUID(uuid)));
-//			throw e;
-//		}
-//
-//		//Defer
-//		try {
-//			// Send RANGE_QUERY_STATE message to validator chaincode support
-//			RangeQueryStateInfo payload = RangeQueryStateInfo.newBuilder()
-//					.setStartKey(startKey)
-//					.setEndKey(endKey)
-//					.setLimit(limit)
-//					.build();
-//
-//			ChaincodeMessage message = ChaincodeMessage.newBuilder()
-//					.setType(RANGE_QUERY_STATE)
-//					.setPayload(payload.toByteString())
-//					.setUuid(uuid)
-//					.build();
-//
-//			logger.debug(String.format("[%s]Sending %s", shortUUID(message), RANGE_QUERY_STATE));
-//			try {
-//				serialSend(message);
-//			} catch (Exception e){
-//				logger.error(String.format("[%s]error sending %s", shortUUID(message), RANGE_QUERY_STATE));
-//				throw new RuntimeException("could not send message");
-//			}
-//
-//			// Wait on responseChannel for response
-//			ChaincodeMessage response;
-//			try {
-//				response = receiveChannel(responseChannel);
-//			} catch (Exception e) {
-//				logger.error(String.format("[%s]Received unexpected message type", uuid));
-//				throw new RuntimeException("Received unexpected message type");		
-//			}
-//
-//			if (response.getType() == RESPONSE) {
-//				// Success response
-//				logger.debug(String.format("[%s]Received %s. Successfully got range",
-//						shortUUID(response.getUuid()), RESPONSE));
-//
-//				RangeQueryStateResponse rangeQueryResponse;
-//				try {
-//					rangeQueryResponse = RangeQueryStateResponse.parseFrom(response.getPayload());
-//				} catch (Exception e) {					
-//					logger.error(String.format("[%s]unmarshall error", shortUUID(response.getUuid())));
-//					throw new RuntimeException("Error unmarshalling RangeQueryStateResponse.");
-//				}
-//
-//				return rangeQueryResponse;
-//			}
-//
-//			if (response.getType() == ERROR) {
-//				// Error response
-//				logger.error(String.format("[%s]Received %s",
-//						shortUUID(response.getUuid()), ERROR));
-//				throw new RuntimeException(response.getPayload().toStringUtf8());
-//			}
-//
-//			// Incorrect chaincode message received
-//			logger.error(String.format("Incorrect chaincode message %s recieved. Expecting %s or %s",
-//					response.getType(), RESPONSE, ERROR));
-//			throw new RuntimeException("Incorrect chaincode message received");
-//		} finally {
-//			deleteChannel(uuid);
-//		}
-//	}
+	public RangeQueryStateResponse handleRangeQueryState(String startKey, String endKey, String uuid) {
+		// Create the channel on which to communicate the response from validating peer
+		Channel<ChaincodeMessage> responseChannel;
+		try {
+			responseChannel = createChannel(uuid);
+		} catch (Exception e) {
+			logger.debug(String.format("[%s]Another state request pending for this Uuid."
+					+ " Cannot process.", shortUUID(uuid)));
+			throw e;
+		}
+
+		//Defer
+		try {
+			// Send RANGE_QUERY_STATE message to validator chaincode support
+			RangeQueryState payload = RangeQueryState.newBuilder()
+					.setStartKey(startKey)
+					.setEndKey(endKey)
+					.build();
+
+			ChaincodeMessage message = ChaincodeMessage.newBuilder()
+					.setType(RANGE_QUERY_STATE)
+					.setPayload(payload.toByteString())
+					.setUuid(uuid)
+					.build();
+
+			logger.debug(String.format("[%s]Sending %s", shortUUID(message), RANGE_QUERY_STATE));
+			try {
+				serialSend(message);
+			} catch (Exception e){
+				logger.error(String.format("[%s]error sending %s", shortUUID(message), RANGE_QUERY_STATE));
+				throw new RuntimeException("could not send message");
+			}
+
+			// Wait on responseChannel for response
+			ChaincodeMessage response;
+			try {
+				response = receiveChannel(responseChannel);
+			} catch (Exception e) {
+				logger.error(String.format("[%s]Received unexpected message type", uuid));
+				throw new RuntimeException("Received unexpected message type");
+			}
+
+			if (response.getType() == RESPONSE) {
+				// Success response
+				logger.debug(String.format("[%s]Received %s. Successfully got range",
+						shortUUID(response.getUuid()), RESPONSE));
+
+				RangeQueryStateResponse rangeQueryResponse;
+				try {
+					rangeQueryResponse = RangeQueryStateResponse.parseFrom(response.getPayload());
+				} catch (Exception e) {
+					logger.error(String.format("[%s]unmarshall error", shortUUID(response.getUuid())));
+					throw new RuntimeException("Error unmarshalling RangeQueryStateResponse.");
+				}
+
+				return rangeQueryResponse;
+			}
+
+			if (response.getType() == ERROR) {
+				// Error response
+				logger.error(String.format("[%s]Received %s",
+						shortUUID(response.getUuid()), ERROR));
+				throw new RuntimeException(response.getPayload().toStringUtf8());
+			}
+
+			// Incorrect chaincode message received
+			logger.error(String.format("Incorrect chaincode message %s recieved. Expecting %s or %s",
+					response.getType(), RESPONSE, ERROR));
+			throw new RuntimeException("Incorrect chaincode message received");
+		} finally {
+			deleteChannel(uuid);
+		}
+	}
 
 	public ByteString handleInvokeChaincode(String chaincodeName, String function, String[] args, String uuid) {
 		// Check if this is a transaction
@@ -912,7 +913,6 @@ public class Handler {
 	// handleMessage message handles loop for org.hyperledger.java.shim side of chaincode/validator stream.
 	public synchronized void handleMessage(ChaincodeMessage message) throws Exception {
 
-
 		if (message.getType() == ChaincodeMessage.Type.KEEPALIVE){
 			logger.debug(String.format("[%s] Recieved KEEPALIVE message, do nothing",
 					shortUUID(message)));
@@ -920,6 +920,7 @@ public class Handler {
 			// and it does not touch the state machine
 				return;
 		}
+
 		logger.debug(String.format("[%s]Handling ChaincodeMessage of type: %s(state:%s)",
 				shortUUID(message), message.getType(), fsm.current()));
 

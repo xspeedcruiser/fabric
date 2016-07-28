@@ -297,8 +297,9 @@ func (chaincodeSupport *ChaincodeSupport) getArgsAndEnv(cID *pb.ChaincodeID, cLa
 		chaincodeLogger.Debugf("Executable is %s", args[0])
 	case pb.ChaincodeSpec_JAVA:
 		//TODO add security args
+		chaincodeLogger.Debugf("path %s ", strings.Split(chaincodeSupport.chaincodeInstallPath, "/"))
 		args = strings.Split(
-			fmt.Sprintf("/examples/bin/examples -a %s -i %s",
+			fmt.Sprintf("/root/Chaincode/bin/runChaincode %s -i %s",
 				chaincodeSupport.peerAddress, cID.Name),
 			" ")
 		if chaincodeSupport.peerTLS {
