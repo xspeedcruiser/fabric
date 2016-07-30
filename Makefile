@@ -169,9 +169,8 @@ build/image/ccenv/.dummy: build/image/src/.dummy build/image/ccenv/bin/protoc-ge
 # Special override for java-image 
 build/image/javaenv/.dummy: Makefile $(JAVASHIM_DEPS)
 	@echo "Building docker javaenv-image"
-	@mkdir -p $(@D)/libs
-	@cp core/chaincode/shim/java/build/libs/*.jar $(@D)/libs
 	@cat images/javaenv/Dockerfile.in > $(@D)/Dockerfile
+	@git ls-files core/chaincode/shim/java | tar -jcT - > $(@D)/javashimsrc.tar.bz2
 	docker build -t $(PROJECT_NAME)-javaenv:latest $(@D)
 	@touch $@
 

@@ -1,9 +1,4 @@
 FROM hyperledger/fabric-src:latest
-RUN wget https://services.gradle.org/distributions/gradle-2.12-bin.zip -P /tmp 
-RUN unzip -q /tmp/gradle-2.12-bin.zip -d /opt && rm /tmp/gradle-2.12-bin.zip
-RUN ln -s /opt/gradle-2.12/bin/gradle /usr/bin
-
 RUN mkdir -p /var/hyperledger/db
 COPY bin/* $GOPATH/bin/
 WORKDIR $GOPATH/src/github.com/hyperledger/fabric
-RUN core/chaincode/shim/java/javabuild.sh
