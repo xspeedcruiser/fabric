@@ -3,6 +3,7 @@ package java
 import (
 	"archive/tar"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -38,27 +39,44 @@ func writeChaincodePackage(spec *pb.ChaincodeSpec, tw *tar.Writer) error {
 	}
 	urlLocation = urlLocation[strings.LastIndex(urlLocation, "/")+1:]
 
-	var newRunLine string
+	var dockerFileContents string
+
 	if viper.GetBool("security.enabled") {
 		//todo
 	} else {
-		newRunLine = fmt.Sprintf("CMD cd %s &&  gradle -b build.gradle build\n"+
-			"COPY %s/build/distributions/Chaincode.zip /root/\n"+
-			"RUN unzip -od /root /root/Chaincode.zip\n", spec.ChaincodeID.Path, spec.ChaincodeID.Path)
+
+		var buf []string
+
+		//let the executable's name be chaincode ID's name
+		buf = append(buf, viper.GetString("chaincode.car.Dockerfile"))
+		buf = append(buf, fmt.Sprintf("RUN gradle -b %s/build.gradle", spec.ChaincodeID.Path))
+		buf = append(buf, fmt.Sprintf("RUN unzip -od /root %s/build/distributions/Chaincode.zip", spec.ChaincodeID.Path))
+
+		dockerFileContents = strings.Join(buf, "\n")
+
 	}
 	fmt.Println(spec.ChaincodeID.Path)
-	fmt.Println(newRunLine)
+	fmt.Println(dockerFileContents)
 
-	dockerFileContents := fmt.Sprintf("%s\n%s", viper.GetString("chaincode.java.Dockerfile"), newRunLine)
 	dockerFileSize := int64(len([]byte(dockerFileContents)))
 
 	//Make headers identical by using zero time
 	var zeroTime time.Time
 	tw.WriteHeader(&tar.Header{Name: "Dockerfile", Size: dockerFileSize, ModTime: zeroTime, AccessTime: zeroTime, ChangeTime: zeroTime})
 	tw.Write([]byte(dockerFileContents))
-	err := cutil.WriteGopathSrc(tw, spec.ChaincodeID.Path)
+	err := cutil.WriteJavaProjectToPackage(tw, spec.ChaincodeID.Path)
 	if err != nil {
 		return fmt.Errorf("Error writing Chaincode package contents: %s", err)
 	}
+	file, err := os.Create("/tmp/chaincode.tar")
+	tr1 := tar.NewWriter(file)
+	defer tr1.Close()
+	tr1.WriteHeader(&tar.Header{Name: "Dockerfile", Size: dockerFileSize, ModTime: zeroTime, AccessTime: zeroTime, ChangeTime: zeroTime})
+	tr1.Write([]byte(dockerFileContents))
+	err1 := cutil.WriteJavaProjectToPackage(tr1, spec.ChaincodeID.Path)
+	if err1 != nil {
+		return fmt.Errorf("Error writing Chaincode package contents: %s", err)
+	}
+
 	return nil
 }
