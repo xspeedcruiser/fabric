@@ -48,7 +48,7 @@ func writeChaincodePackage(spec *pb.ChaincodeSpec, tw *tar.Writer) error {
 		var buf []string
 
 		//let the executable's name be chaincode ID's name
-		buf = append(buf, viper.GetString("chaincode.car.Dockerfile"))
+		buf = append(buf, viper.GetString("chaincode.java.Dockerfile"))
 		buf = append(buf, fmt.Sprintf("RUN gradle -b %s/build.gradle", spec.ChaincodeID.Path))
 		buf = append(buf, fmt.Sprintf("RUN unzip -od /root %s/build/distributions/Chaincode.zip", spec.ChaincodeID.Path))
 
