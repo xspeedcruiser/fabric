@@ -171,6 +171,8 @@ build/image/javaenv/.dummy: Makefile $(JAVASHIM_DEPS)
 	@echo "Building docker javaenv-image"
 	@cat images/javaenv/Dockerfile.in > $(@D)/Dockerfile
 	@git ls-files core/chaincode/shim/java | tar -jcT - > $(@D)/javashimsrc.tar.bz2
+	@git ls-files protos  | tar -jcT - > $(@D)/protos.tar.bz2
+	@cp settings.gradle $(@D)
 	docker build -t $(PROJECT_NAME)-javaenv:latest $(@D)
 	@touch $@
 
