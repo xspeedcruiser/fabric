@@ -42,8 +42,9 @@ func writeChaincodePackage(spec *pb.ChaincodeSpec, tw *tar.Writer) error {
 	if viper.GetBool("security.enabled") {
 		//todo
 	} else {
-		newRunLine = fmt.Sprintf("COPY %s/build/distributions/Chaincode.zip /root/\n"+
-			"RUN unzip -od /root /root/Chaincode.zip\n", urlLocation)
+		newRunLine = fmt.Sprintf("CMD cd %s &&  gradle -b build.gradle build\n"+
+			"COPY %s/build/distributions/Chaincode.zip /root/\n"+
+			"RUN unzip -od /root /root/Chaincode.zip\n", urlLocation, urlLocation)
 	}
 
 	dockerFileContents := fmt.Sprintf("%s\n%s", viper.GetString("chaincode.java.Dockerfile"), newRunLine)

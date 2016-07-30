@@ -31,14 +31,14 @@ plugins {
 }
 
 
-task printClasspath {
-    doLast {
-        configurations.testRuntime.each { println it }
-    }
-}
+// task printClasspath {
+//     doLast {
+//         configurations.testRuntime.each { println it }
+//     }
+// }
 
-archivesBaseName = "java-example"
-mainClassName=System.getProperty("mainClassName")
+archivesBaseName = "RangeExample"
+mainClassName="example.RangeExample"
 
 run {
 	if (project.hasProperty("appArgs")) {
@@ -50,7 +50,6 @@ sourceSets {
 	main {
 		java {
 			srcDir 'src/main/java'
-                        include '**/'+System.getProperty("baseName")+'.java'
 		}
 	}
 }
@@ -62,14 +61,23 @@ repositories {
 
 
 distZip {
-  destinationDir = file("${projectDir}")
-  archiveName=System.getProperty("baseName")+'.zip'
+//  destinationDir = file("${projectDir}")
+  archiveName='Chaincode.zip'
   duplicatesStrategy='exclude'
 }
 
 startScripts{
- applicationName='run'+System.getProperty("baseName")
+ applicationName='runChaincode'
 }
+
+// jar.doFirst {
+//  destinationDir = file("${projectDir}")
+//    manifest {
+//     attributes ('Main-Class': mainClassName,
+//                 'Class-Path': configurations.runtime.each { "/root/lib"+"/$it.name" }.join(' ')
+//                 )
+// }
+// }
 
 
 dependencies {

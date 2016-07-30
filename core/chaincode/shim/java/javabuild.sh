@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 #
 #Copyright DTCC 2016 All Rights Reserved.
@@ -17,13 +17,9 @@
 #
 #
 set -e
-PARENTDIR=$(pwd)
-DOCKER_CONTEXT=${1}
+PARENTDIR=$(pwd)	
 
-# copy proto files from source for build
 
-cp ${PARENTDIR}/protos/chaincode.proto ${PARENTDIR}/core/chaincode/shim/java/src/main/proto/
-cp ${PARENTDIR}/protos/chaincodeevent.proto ${PARENTDIR}/core/chaincode/shim/java/src/main/proto/
-
-gradle -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle clean
-gradle -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle build
+gradle -q -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle clean
+gradle -q -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle copyProto
+gradle -q -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle build

@@ -81,6 +81,15 @@ task copyToLib(type: Copy) {
     from configurations.runtime
 }
 
+
+task copyProtos(type:Copy){
+ into "${projectDir}/src/main/proto"
+ from "${rootDir}/protos"
+ include '**/chaincodeevent.proto'
+ include '**/chaincode.proto'
+}
+
+build.dependsOn(copyProtos)
 build.finalizedBy(copyToLib)
 
 dependencies {

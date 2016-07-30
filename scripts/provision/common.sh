@@ -4,5 +4,6 @@
 
 apt-get update -qq
 
-# Used by CHAINTOOL
-apt-get install -y default-jre
+# Used by CHAINTOOL and java chaincode build
+add-apt-repository ppa:openjdk-r/ppa -y
+apt-get update && apt-get install openjdk-8-jdk -y
