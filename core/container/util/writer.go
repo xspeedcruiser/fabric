@@ -124,8 +124,8 @@ func WriteJavaProjectToPackage(tw *tar.Writer, srcPath string) error {
 
 	rootDirLen := len(rootDirectory)
 	walkFn := func(path string, info os.FileInfo, err error) error {
-
 		// If path includes .git, ignore
+
 		if strings.Contains(path, ".git") {
 			return nil
 		}
@@ -145,7 +145,7 @@ func WriteJavaProjectToPackage(tw *tar.Writer, srcPath string) error {
 
 		newPath := fmt.Sprintf("src%s", path[rootDirLen:])
 
-		vmLogger.Debugf("inside walk - path - %s, newpath - %s", path, newPath)
+		vmLogger.Debugf("Including files to Docker context from path - %s, to newpath - %s", path, newPath)
 
 		err = WriteFileToPackage(path, newPath, tw)
 		if err != nil {

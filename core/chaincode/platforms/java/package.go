@@ -3,7 +3,6 @@ package java
 import (
 	"archive/tar"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -40,23 +39,18 @@ func writeChaincodePackage(spec *pb.ChaincodeSpec, tw *tar.Writer) error {
 	urlLocation = urlLocation[strings.LastIndex(urlLocation, "/")+1:]
 
 	var dockerFileContents string
+	var buf []string
 
 	if viper.GetBool("security.enabled") {
 		//todo
 	} else {
 
-		var buf []string
-
-		//let the executable's name be chaincode ID's name
-		buf = append(buf, viper.GetString("chaincode.java.Dockerfile"))
-		buf = append(buf, fmt.Sprintf("RUN gradle -b %s/build.gradle", spec.ChaincodeID.Path))
-		buf = append(buf, fmt.Sprintf("RUN unzip -od /root %s/build/distributions/Chaincode.zip", spec.ChaincodeID.Path))
-
-		dockerFileContents = strings.Join(buf, "\n")
+		buf = append(buf, fmt.Sprintf("COPY src /root"))
+		buf = append(buf, fmt.Sprintf("RUN gradle -b build.gradle build"))
+		buf = append(buf, fmt.Sprintf("RUN unzip -od /root build/distributions/Chaincode.zip"))
 
 	}
-	fmt.Println(spec.ChaincodeID.Path)
-	fmt.Println(dockerFileContents)
+	dockerFileContents = strings.Join(buf, "\n")
 
 	dockerFileSize := int64(len([]byte(dockerFileContents)))
 
@@ -66,15 +60,6 @@ func writeChaincodePackage(spec *pb.ChaincodeSpec, tw *tar.Writer) error {
 	tw.Write([]byte(dockerFileContents))
 	err := cutil.WriteJavaProjectToPackage(tw, spec.ChaincodeID.Path)
 	if err != nil {
-		return fmt.Errorf("Error writing Chaincode package contents: %s", err)
-	}
-	file, err := os.Create("/tmp/chaincode.tar")
-	tr1 := tar.NewWriter(file)
-	defer tr1.Close()
-	tr1.WriteHeader(&tar.Header{Name: "Dockerfile", Size: dockerFileSize, ModTime: zeroTime, AccessTime: zeroTime, ChangeTime: zeroTime})
-	tr1.Write([]byte(dockerFileContents))
-	err1 := cutil.WriteJavaProjectToPackage(tr1, spec.ChaincodeID.Path)
-	if err1 != nil {
 		return fmt.Errorf("Error writing Chaincode package contents: %s", err)
 	}
 
