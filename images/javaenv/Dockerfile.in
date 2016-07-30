@@ -2,7 +2,6 @@ FROM  java:openjdk-8
 RUN wget https://services.gradle.org/distributions/gradle-2.12-bin.zip -P /tmp --quiet
 RUN unzip -q /tmp/gradle-2.12-bin.zip -d /opt && rm /tmp/gradle-2.12-bin.zip
 RUN ln -s /opt/gradle-2.12/bin/gradle /usr/bin
-RUM mkdir /root
 ADD javashimsrc.tar.bz2 /root
 ADD protos.tar.bz2 /root
 ADD settings.gradle /root

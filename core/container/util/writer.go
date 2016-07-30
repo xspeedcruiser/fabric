@@ -119,7 +119,7 @@ func WriteGopathSrc(tw *tar.Writer, excludeDir string) error {
 	return nil
 }
 
-func WriteJavaProjectToPackage (tw *tar.Writer, srcPath string	) error {
+func WriteJavaProjectToPackage(tw *tar.Writer, srcPath string) error {
 	rootDirectory := srcPath
 
 	rootDirLen := len(rootDirectory)
@@ -144,6 +144,8 @@ func WriteJavaProjectToPackage (tw *tar.Writer, srcPath string	) error {
 		}
 
 		newPath := fmt.Sprintf("src%s", path[rootDirLen:])
+
+		vmLogger.Debugf("inside walk - path - %s, newpath - %s", path, newPath)
 
 		err = WriteFileToPackage(path, newPath, tw)
 		if err != nil {
