@@ -62,17 +62,17 @@ repositories {
 
 distZip {
 //  destinationDir = file("${projectDir}")
-  archiveName='SimpleSample.zip'
+  archiveName='Chaincode.zip'
   duplicatesStrategy='exclude'
 }
 
 startScripts{
- applicationName='runSimpleSample'
+ applicationName='runChaincode'
 }
 
-jar {
- destinationDir = file("${projectDir}")
-}
+// jar {
+//  destinationDir = file("${projectDir}")
+// }
 
 
 dependencies {

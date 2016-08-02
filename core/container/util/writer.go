@@ -39,6 +39,11 @@ var fileTypes = map[string]bool{
 	".yaml": true,
 	".json": true,
 }
+var javaFileTypes = map[string]bool{
+	".java":       true,
+	".properties": true,
+	".gradle":     true,
+}
 
 //WriteGopathSrc tars up files under gopath src
 func WriteGopathSrc(tw *tar.Writer, excludeDir string) error {
@@ -112,6 +117,50 @@ func WriteGopathSrc(tw *tar.Writer, excludeDir string) error {
 	}
 	//ioutil.WriteFile("/tmp/chaincode_deployment.tar", inputbuf.Bytes(), 0644)
 	return nil
+}
+
+func WriteJavaProjectToPackage(tw *tar.Writer, srcPath string) error {
+	rootDirectory := srcPath
+
+	rootDirLen := len(rootDirectory)
+	walkFn := func(path string, info os.FileInfo, err error) error {
+		// If path includes .git, ignore
+
+		if strings.Contains(path, ".git") {
+			return nil
+		}
+
+		if info.Mode().IsDir() {
+			return nil
+		}
+		if len(path[rootDirLen:]) == 0 {
+			return nil
+		}
+
+		// we only want 'fileTypes' java related source files at this point
+		ext := filepath.Ext(path)
+		if _, ok := javaFileTypes[ext]; ok != true {
+			return nil
+		}
+
+		newPath := fmt.Sprintf("src%s", path[rootDirLen:])
+
+		vmLogger.Debugf("Including files to Docker context from path - %s, to newpath - %s", path, newPath)
+
+		err = WriteFileToPackage(path, newPath, tw)
+		if err != nil {
+			return fmt.Errorf("Error writing file to package: %s", err)
+		}
+
+		return nil
+	}
+
+	if err := filepath.Walk(rootDirectory, walkFn); err != nil {
+		vmLogger.Infof("Error walking rootDirectory: %s", err)
+		return err
+	}
+	return nil
+
 }
 
 //WriteFileToPackage writes a file to the tarball
