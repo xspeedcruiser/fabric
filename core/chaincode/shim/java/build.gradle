@@ -89,11 +89,12 @@ task copyProtos(type:Copy){
  include '**/chaincode.proto'
 }
 
+tasks['build'].mustRunAfter tasks['copyProtos']
 build.dependsOn(copyProtos)
 build.finalizedBy(copyToLib)
 
 dependencies {
-	compile 'com.google.protobuf:protobuf-java:3.0.0-beta-2'
+	compile 'com.google.protobuf:protobuf-java:3.0.0-beta-2' 
 	compile 'io.grpc:grpc-all:0.13.2'
 	compile 'commons-cli:commons-cli:1.3.1'
 }
