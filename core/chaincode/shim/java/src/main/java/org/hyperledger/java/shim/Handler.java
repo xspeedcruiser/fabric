@@ -22,24 +22,26 @@ package org.hyperledger.java.shim;
 import static org.hyperledger.java.fsm.CallbackType.AFTER_EVENT;
 import static org.hyperledger.java.fsm.CallbackType.BEFORE_EVENT;
 import static org.hyperledger.java.fsm.CallbackType.ENTER_STATE;
-import static protos.Chaincode.ChaincodeMessage.Type.COMPLETED;
-import static protos.Chaincode.ChaincodeMessage.Type.DEL_STATE;
-import static protos.Chaincode.ChaincodeMessage.Type.ERROR;
-import static protos.Chaincode.ChaincodeMessage.Type.GET_STATE;
-import static protos.Chaincode.ChaincodeMessage.Type.INIT;
-import static protos.Chaincode.ChaincodeMessage.Type.INVOKE_CHAINCODE;
-import static protos.Chaincode.ChaincodeMessage.Type.INVOKE_QUERY;
-import static protos.Chaincode.ChaincodeMessage.Type.PUT_STATE;
-import static protos.Chaincode.ChaincodeMessage.Type.QUERY;
-import static protos.Chaincode.ChaincodeMessage.Type.QUERY_COMPLETED;
-import static protos.Chaincode.ChaincodeMessage.Type.QUERY_ERROR;
-import static protos.Chaincode.ChaincodeMessage.Type.READY;
-import static protos.Chaincode.ChaincodeMessage.Type.REGISTERED;
-import static protos.Chaincode.ChaincodeMessage.Type.RESPONSE;
-import static protos.Chaincode.ChaincodeMessage.Type.TRANSACTION;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.COMPLETED;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.DEL_STATE;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.ERROR;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.GET_STATE;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.INIT;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.INVOKE_CHAINCODE;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.INVOKE_QUERY;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.PUT_STATE;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.QUERY;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.QUERY_COMPLETED;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.QUERY_ERROR;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.RANGE_QUERY_STATE;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.READY;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.REGISTERED;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.RESPONSE;
+import static org.hyperledger.protos.Chaincode.ChaincodeMessage.Type.TRANSACTION;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.ProtocolStringList;
@@ -54,12 +56,14 @@ import org.hyperledger.java.helper.Channel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import io.grpc.stub.StreamObserver;
-import protos.Chaincode.ChaincodeID;
-import protos.Chaincode.ChaincodeInput;
-import protos.Chaincode.ChaincodeMessage;
-import protos.Chaincode.ChaincodeMessage.Builder;
-import protos.Chaincode.ChaincodeSpec;
-import protos.Chaincode.PutStateInfo;
+import org.hyperledger.protos.Chaincode.ChaincodeID;
+import org.hyperledger.protos.Chaincode.ChaincodeInput;
+import org.hyperledger.protos.Chaincode.ChaincodeMessage;
+import org.hyperledger.protos.Chaincode.ChaincodeMessage.Builder;
+import org.hyperledger.protos.Chaincode.ChaincodeSpec;
+import org.hyperledger.protos.Chaincode.PutStateInfo;
+import org.hyperledger.protos.Chaincode.RangeQueryStateResponse;
+import org.hyperledger.protos.Chaincode.RangeQueryState;
 
 public class Handler {
 
@@ -68,8 +72,8 @@ public class Handler {
 	private StreamObserver<ChaincodeMessage> chatStream;
 	private ChaincodeBase chaincode;
 
-	private HashMap<String, Boolean> isTransaction;
-	private HashMap<String, Channel<ChaincodeMessage>> responseChannel;
+	private Map<String, Boolean> isTransaction;
+	private Map<String, Channel<ChaincodeMessage>> responseChannel;
 	public Channel<NextStateInfo> nextState; 
 
 	private FSM fsm;
@@ -687,80 +691,79 @@ public class Handler {
 		}
 	}
 
-//	public RangeQueryStateResponse handleRangeQueryState(String startKey, String endKey, int limit, String uuid) {
-//		// Create the channel on which to communicate the response from validating peer
-//		Channel<ChaincodeMessage> responseChannel;
-//		try {
-//			responseChannel = createChannel(uuid);
-//		} catch (Exception e) {
-//			logger.debug(String.format("[%s]Another state request pending for this Uuid."
-//					+ " Cannot process.", shortID(uuid)));
-//			throw e;
-//		}
-//
-//		//Defer
-//		try {
-//			// Send RANGE_QUERY_STATE message to validator chaincode support
-//			RangeQueryStateInfo payload = RangeQueryStateInfo.newBuilder()
-//					.setStartKey(startKey)
-//					.setEndKey(endKey)
-//					.setLimit(limit)
-//					.build();
-//
-//			ChaincodeMessage message = ChaincodeMessage.newBuilder()
-//					.setType(RANGE_QUERY_STATE)
-//					.setPayload(payload.toByteString())
-//					.setTxid(uuid)
-//					.build();
-//
-//			logger.debug(String.format("[%s]Sending %s", shortID(message), RANGE_QUERY_STATE));
-//			try {
-//				serialSend(message);
-//			} catch (Exception e){
-//				logger.error(String.format("[%s]error sending %s", shortID(message), RANGE_QUERY_STATE));
-//				throw new RuntimeException("could not send message");
-//			}
-//
-//			// Wait on responseChannel for response
-//			ChaincodeMessage response;
-//			try {
-//				response = receiveChannel(responseChannel);
-//			} catch (Exception e) {
-//				logger.error(String.format("[%s]Received unexpected message type", uuid));
-//				throw new RuntimeException("Received unexpected message type");		
-//			}
-//
-//			if (response.getType() == RESPONSE) {
-//				// Success response
-//				logger.debug(String.format("[%s]Received %s. Successfully got range",
-//						shortID(response.getTxid()), RESPONSE));
-//
-//				RangeQueryStateResponse rangeQueryResponse;
-//				try {
-//					rangeQueryResponse = RangeQueryStateResponse.parseFrom(response.getPayload());
-//				} catch (Exception e) {					
-//					logger.error(String.format("[%s]unmarshall error", shortID(response.getTxid())));
-//					throw new RuntimeException("Error unmarshalling RangeQueryStateResponse.");
-//				}
-//
-//				return rangeQueryResponse;
-//			}
-//
-//			if (response.getType() == ERROR) {
-//				// Error response
-//				logger.error(String.format("[%s]Received %s",
-//						shortID(response.getTxid()), ERROR));
-//				throw new RuntimeException(response.getPayload().toStringUtf8());
-//			}
-//
-//			// Incorrect chaincode message received
-//			logger.error(String.format("Incorrect chaincode message %s recieved. Expecting %s or %s",
-//					response.getType(), RESPONSE, ERROR));
-//			throw new RuntimeException("Incorrect chaincode message received");
-//		} finally {
-//			deleteChannel(uuid);
-//		}
-//	}
+	public RangeQueryStateResponse handleRangeQueryState(String startKey, String endKey, String uuid) {
+		// Create the channel on which to communicate the response from validating peer
+		Channel<ChaincodeMessage> responseChannel;
+		try {
+			responseChannel = createChannel(uuid);
+		} catch (Exception e) {
+			logger.debug(String.format("[%s]Another state request pending for this Uuid."
+					+ " Cannot process.", shortID(uuid)));
+			throw e;
+		}
+
+		//Defer
+		try {
+			// Send RANGE_QUERY_STATE message to validator chaincode support
+			RangeQueryState payload = RangeQueryState.newBuilder()
+					.setStartKey(startKey)
+					.setEndKey(endKey)
+					.build();
+
+			ChaincodeMessage message = ChaincodeMessage.newBuilder()
+					.setType(RANGE_QUERY_STATE)
+					.setPayload(payload.toByteString())
+					.setTxid(uuid)
+					.build();
+
+			logger.debug(String.format("[%s]Sending %s", shortID(message), RANGE_QUERY_STATE));
+			try {
+				serialSend(message);
+			} catch (Exception e){
+				logger.error(String.format("[%s]error sending %s", shortID(message), RANGE_QUERY_STATE));
+				throw new RuntimeException("could not send message");
+			}
+
+			// Wait on responseChannel for response
+			ChaincodeMessage response;
+			try {
+				response = receiveChannel(responseChannel);
+			} catch (Exception e) {
+				logger.error(String.format("[%s]Received unexpected message type", uuid));
+				throw new RuntimeException("Received unexpected message type");
+			}
+
+			if (response.getType() == RESPONSE) {
+				// Success response
+				logger.debug(String.format("[%s]Received %s. Successfully got range",
+						shortID(response.getTxid()), RESPONSE));
+
+				RangeQueryStateResponse rangeQueryResponse;
+				try {
+					rangeQueryResponse = RangeQueryStateResponse.parseFrom(response.getPayload());
+				} catch (Exception e) {
+					logger.error(String.format("[%s]unmarshall error", shortID(response.getTxid())));
+					throw new RuntimeException("Error unmarshalling RangeQueryStateResponse.");
+				}
+
+				return rangeQueryResponse;
+			}
+
+			if (response.getType() == ERROR) {
+				// Error response
+				logger.error(String.format("[%s]Received %s",
+						shortID(response.getTxid()), ERROR));
+				throw new RuntimeException(response.getPayload().toStringUtf8());
+			}
+
+			// Incorrect chaincode message received
+			logger.error(String.format("Incorrect chaincode message %s recieved. Expecting %s or %s",
+					response.getType(), RESPONSE, ERROR));
+			throw new RuntimeException("Incorrect chaincode message received");
+		} finally {
+			deleteChannel(uuid);
+		}
+	}
 
 	public ByteString handleInvokeChaincode(String chaincodeName, String function, String[] args, String uuid) {
 		// Check if this is a transaction
@@ -911,7 +914,6 @@ public class Handler {
 	// handleMessage message handles loop for org.hyperledger.java.shim side of chaincode/validator stream.
 	public synchronized void handleMessage(ChaincodeMessage message) throws Exception {
 
-
 		if (message.getType() == ChaincodeMessage.Type.KEEPALIVE){
 			logger.debug(String.format("[%s] Recieved KEEPALIVE message, do nothing",
 					shortID(message)));
@@ -919,6 +921,7 @@ public class Handler {
 			// and it does not touch the state machine
 				return;
 		}
+
 		logger.debug(String.format("[%s]Handling ChaincodeMessage of type: %s(state:%s)",
 				shortID(message), message.getType(), fsm.current()));
 

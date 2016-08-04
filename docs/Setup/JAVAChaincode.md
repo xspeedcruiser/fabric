@@ -30,7 +30,7 @@ Note: This guide generally assumes you have followed the Chaincode development e
 	* Deploy the chaincode,
 
 ```
-	peer chaincode deploy -l java -n map -p /opt/gopath/src/github.com/hyperledger/fabric/core/chaincode/shim/java -c '{"Function": "init", "Args": ["a","100", "b", "200"]}'
+	peer chaincode deploy -l java -n map -p /opt/gopath/src/github.com/hyperledger/fabric/examples/chaincode/java/SimpleSample -c '{"Function": "init", "Args": ["a","100", "b", "200"]}'
 ```
 
 `6d9a704d95284593fe802a5de89f84e86fb975f00830bc6488713f9441b835cf32d9cd07b087b90e5cb57a88360f90a4de39521a5595545ad689cd64791679e9`
@@ -43,7 +43,7 @@ Note: This guide generally assumes you have followed the Chaincode development e
 * Invoke a transfer transaction,
 
 ```
-	/opt/gopath/src/github.com/hyperledger/fabric/core/chaincode/shim/java$ peer chaincode invoke -l java \
+	peer chaincode invoke -l java \
 	-n 6d9a704d95284593fe802a5de89f84e86fb975f00830bc6488713f9441b835cf32d9cd07b087b90e5cb57a88360f90a4de39521a5595545ad689cd64791679e9 \
 	-c '{"Function": "transfer", "Args": ["a","b", "20"]}'
 ```
@@ -52,19 +52,17 @@ Note: This guide generally assumes you have followed the Chaincode development e
 * Query the values of a and b after the transfer
 
 ```
-	/opt/gopath/src/github.com/hyperledger/fabric/core/chaincode/shim/java$ peer chaincode query -l java \
+	peer chaincode query -l java \
 	-n 6d9a704d95284593fe802a5de89f84e86fb975f00830bc6488713f9441b835cf32d9cd07b087b90e5cb57a88360f90a4de39521a5595545ad689cd64791679e9 \
 	-c '{"Function": "query", "Args": ["a"]}'
 	{"Name":"a","Amount":"80"}
 
 
-	/opt/gopath/src/github.com/hyperledger/fabric/core/chaincode/shim/java$ peer chaincode query -l java \
+	peer chaincode query -l java \
 	-n 6d9a704d95284593fe802a5de89f84e86fb975f00830bc6488713f9441b835cf32d9cd07b087b90e5cb57a88360f90a4de39521a5595545ad689cd64791679e9 \
 	-c '{"Function": "query", "Args": ["b"]}'
 	{"Name":"b","Amount":"220"}
 ```
-
-* To develop your own chaincodes, simply extend the Chaincode class (demonstrated in the SimpleSample Example under the examples package)
 
 
 ### Java chaincode deployment in DEV Mode
@@ -78,13 +76,12 @@ Note: This guide generally assumes you have followed the Chaincode development e
 ```
 3. Open the second Vagrant terminal, and change to Java shim root folder and run gradle build,
 ```
-    cd $GOPATH/src/github.com/hyperledger/fabric/core/chaincode/shim/java
-    gradle build
+    cd $GOPATH/src/github.com/hyperledger/fabric/examples/chaincode/java/SimpleSample
+    gradle -b build.gradle build
 ```
-4. Run the SimpleSample chaincode using the `gradle run`
+4. Run the SimpleSample chaincode using the `gradle -b build.gradle run`
 
 5. Open the third Vagrant terminal to run init and invoke on the chaincode
-
 
 
     peer chaincode deploy -l java -n SimpleSample -c '{"Function": "init", "Args": ["a","100", "b", "200"]}'
@@ -112,3 +109,16 @@ SimpleSample
 19:12:25.667 [crypto] main -> INFO 002 Log level recognized 'info', set to INFO
 {"Name":"b","Amount":"210"}
 ```
+
+### Developing new JAVA chaincode
+1. Create a new Java project structure.
+2. Use existing `build.grade` from  any example JAVA Chaincode project like `examples/chaincode/java/SimpleSample`.
+3. Make your main class extend ChaincodeBase class and implement the following methods from base class.
+  1. `public String run(ChaincodeStub stub, String function, String[] args)   `
+  2. `public String query(ChaincodeStub stub, String function, String[] args)`
+  3. `public String getChaincodeID()`
+4. Modify the `mainClassName` in `build.gradle` to point to your new class.
+5. Build this project using `gradle -b build.gradle build`
+6. Run this chaincode after starting a peer in dev-mode as above using `gradle -b build.gradle run`
+
+
