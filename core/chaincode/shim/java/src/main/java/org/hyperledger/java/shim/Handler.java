@@ -19,6 +19,7 @@ under the License.
 
 package org.hyperledger.java.shim;
 
+
 import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 import org.apache.commons.logging.Log;

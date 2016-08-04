@@ -20,8 +20,6 @@ import com.google.protobuf.ByteString;
 import org.hyperledger.protos.Chaincode;
 import java.util.HashMap;
 import java.util.Map;
-
-
 import java.util.List;
 
 public class ChaincodeStub {
