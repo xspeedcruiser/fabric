@@ -33,7 +33,11 @@ public class SimpleSample extends ChaincodeBase {
 	@Override
 	public String run(ChaincodeStub stub, String function, String[] args) {
 		log.info("In run, function:"+function);
-		
+		log.info("length of args " + args.length);
+		for (String arg:args
+			 ) {
+			log.info("args " + arg);
+		}
 		switch (function) {
 		case "init":
 			init(stub, function, args);
