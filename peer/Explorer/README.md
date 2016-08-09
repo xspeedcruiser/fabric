@@ -6,12 +6,6 @@ The explorer relies on the current gRPC rest APIs that are available. To run the
 
 > peer node start 
 
-After a validating peer is running, start up a http server to handle the REST APIs 
-
->  cd $GOPATH/github.com/hyperledger/fabric/core/rest 
-
-> http-server -a 0.0.0.0 -p 5554 --cors 
-
 You should now be able to open up index.html in the browser of your choice and have access to the explorer. In scripts.js, the REST_ENDPOINT is defined which makes the http requests to the gRPC APIs that are available. By default it is set to:
 
 > const REST_ENDPOINT = 'http://127.0.0.1:5000' 
