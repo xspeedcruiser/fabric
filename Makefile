@@ -1,3 +1,4 @@
+
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -202,7 +203,7 @@ build/image/ccenv/.dummy: build/image/src/.dummy build/image/ccenv/bin/protoc-ge
 	docker tag $(PROJECT_NAME)-ccenv $(PROJECT_NAME)-ccenv:$(DOCKER_TAG)
 	@touch $@
 
-# Special override for java-image
+# Special override for java-image 
 # Following items are packed and sent to docker context while building image
 # 1. Java shim layer source code
 # 2. Proto files used to generate java classes
