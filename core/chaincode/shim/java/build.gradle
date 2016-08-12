@@ -83,12 +83,25 @@ task copyToLib(type: Copy) {
 
 
 task copyProtos(type:Copy){
- into "${projectDir}/src/main/proto"
- from "${rootDir}/protos"
- include '**/chaincodeevent.proto'
- include '**/chaincode.proto'
+
+ from ("${rootDir}/protos"){
+	 include '**/chaincodeevent.proto'
+	 include '**/chaincode.proto'
+ }
+	from ("../") {
+		duplicatesStrategy.EXCLUDE
+		include '**/table.proto'
+		exclude 'java'
+	}
+	into "${projectDir}/src/main/proto"
+
 }
 
+allprojects {
+	tasks.withType(JavaCompile) {
+		options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
+	}
+}
 tasks['build'].mustRunAfter tasks['copyProtos']
 build.dependsOn(copyProtos)
 build.finalizedBy(copyToLib)
