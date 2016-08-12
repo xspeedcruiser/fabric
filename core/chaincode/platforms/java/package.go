@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"os"
+	"os/exec"
 
 	cutil "github.com/hyperledger/fabric/core/container/util"
 	pb "github.com/hyperledger/fabric/protos"
@@ -16,17 +18,24 @@ import (
 func writeChaincodePackage(spec *pb.ChaincodeSpec, tw *tar.Writer) error {
 
 	var urlLocation string
-	if strings.HasPrefix(spec.ChaincodeID.Path, "http://") {
-		urlLocation = spec.ChaincodeID.Path[7:]
-	} else if strings.HasPrefix(spec.ChaincodeID.Path, "https://") {
-		urlLocation = spec.ChaincodeID.Path[8:]
+		var tmp *os.File
+		var err error
+		tmp, err = ioutil.TempFile("", "javachaincode")
+	
+	if strings.HasPrefix(spec.ChaincodeID.Path, "http://") || 
+			strings.HasPrefix(spec.ChaincodeID.Path, "https://") {
+
+		cmd := exec.Command("git clone --depth 1 ", spec.ChaincodeID.Path , tmp.Name())
+		err := cmd.Run()
+		if err != nil {
+			fmt.Errorf("Error cloning git repository %s", err)
+		}
+		
+	urlLocation = tmp.Name()
+	}
+	
 	} else {
 		urlLocation = spec.ChaincodeID.Path
-		//		if !strings.HasPrefix(urlLocation, "/") {
-		//			wd := ""
-		//			wd, _ = os.Getwd()
-		//			urlLocation = wd + "/" + urlLocation
-		//		}
 	}
 
 	if urlLocation == "" {

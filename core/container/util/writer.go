@@ -32,7 +32,7 @@ import (
 
 var vmLogger = logging.MustGetLogger("container")
 
-var fileTypes = map[string]bool{
+var gofileTypes = map[string]bool{
 	".c":    true,
 	".h":    true,
 	".go":   true,
@@ -43,6 +43,8 @@ var javaFileTypes = map[string]bool{
 	".java":       true,
 	".properties": true,
 	".gradle":     true,
+	".jar":		   true,
+	".xml"		   true,
 }
 
 func WriteFolderToTarPackage(tw *tar.Writer, srcPath string, excludeDir string, includeFileTypeMap map[string]bool) error {
@@ -109,7 +111,7 @@ func WriteGopathSrc(tw *tar.Writer, excludeDir string) error {
 	rootDirectory := filepath.Join(gopath, "src")
 	vmLogger.Infof("rootDirectory = %s", rootDirectory)
 
-	if err := WriteFolderToTarPackage(tw, rootDirectory, excludeDir, fileTypes); err != nil {
+	if err := WriteFolderToTarPackage(tw, rootDirectory, excludeDir, gofileTypes); err != nil {
 		vmLogger.Errorf("Error writing folder to tar package %s", err)
 		return err
 	}

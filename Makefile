@@ -1,3 +1,4 @@
+
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -182,7 +183,7 @@ build/image/javaenv/.dummy: Makefile $(JAVASHIM_DEPS)
 	# 2. Proto files used to generate java classes
 	# 3. Gradle settings file
 	@git ls-files core/chaincode/shim/java | tar -jcT - > $(@D)/javashimsrc.tar.bz2
-	@git ls-files protos settings.gradle  | tar -jcT - > $(@D)/protos.tar.bz2
+	@git ls-files protos core/chaincode/shim/table.proto settings.gradle  | tar -jcT - > $(@D)/protos.tar.bz2
 	docker build -t $(PROJECT_NAME)-javaenv:latest $(@D)
 	@touch $@
 
