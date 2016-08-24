@@ -47,5 +47,7 @@ wget https://services.gradle.org/distributions/gradle-2.12-bin.zip -P /tmp --qui
 unzip -q /tmp/gradle-2.12-bin.zip -d /opt && rm /tmp/gradle-2.12-bin.zip
 ln -s /opt/gradle-2.12/bin/gradle /usr/bin
 
+apt-get install maven -y
+
 # Set the default JDK to 1.8
 update-java-alternatives -s java-1.8.0-openjdk-amd64

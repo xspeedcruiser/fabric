@@ -45,6 +45,7 @@ var javaFileTypes = map[string]bool{
 	".gradle":     true,
 	".jar":        true,
 	".xml":        true,
+	".sh":         true,
 }
 
 func WriteFolderToTarPackage(tw *tar.Writer, srcPath string, excludeDir string, includeFileTypeMap map[string]bool) error {
