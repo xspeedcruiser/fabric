@@ -3,6 +3,7 @@ package java
 import (
 	"archive/tar"
 	"fmt"
+	"io/ioutil"
 	"strings"
 	"time"
 
@@ -10,6 +11,32 @@ import (
 	pb "github.com/hyperledger/fabric/protos"
 	"github.com/spf13/viper"
 )
+
+var buildCmd = map[string]string{
+	"build.gradle": "gradle -b build.gradle clean && gradle -b build.gradle build",
+	"pom.xml":      "mvn -f pom.xml clean && mvn -f pom.xml package",
+}
+
+//return the type of build gradle/maven based on the file
+//found in java chaincode project root
+//build.gradle - gradle  - returns the first found build type
+//pom.xml - maven
+func getBuildCmd(packagePath string) (string, error) {
+	files, err := ioutil.ReadDir(packagePath)
+	if err != nil {
+		return "", err
+	} else {
+		for _, f := range files {
+			if !f.IsDir() {
+				if buildCmd, ok := buildCmd[f.Name()]; ok == true {
+					return buildCmd, nil
+				}
+			}
+		}
+		return "", fmt.Errorf("Build file not found")
+	}
+	return "", fmt.Errorf("Error when find build type of Java chaincode")
+}
 
 //tw is expected to have the chaincode in it from GenerateHashcode.
 //This method will just package the dockerfile
@@ -37,6 +64,10 @@ func writeChaincodePackage(spec *pb.ChaincodeSpec, tw *tar.Writer) error {
 		urlLocation = urlLocation[:len(urlLocation)-1]
 	}
 
+	buildCmd, err := getBuildCmd(urlLocation)
+	if err != nil {
+		return err
+	}
 	var dockerFileContents string
 	var buf []string
 
@@ -44,15 +75,14 @@ func writeChaincodePackage(spec *pb.ChaincodeSpec, tw *tar.Writer) error {
 		//todo
 	} else {
 		buf = append(buf, cutil.GetDockerfileFromConfig("chaincode.java.Dockerfile"))
-		buf = append(buf, "COPY src /root")
-		buf = append(buf, "RUN gradle -b build.gradle build")
-		buf = append(buf, "RUN unzip -od /root build/distributions/Chaincode.zip")
-
+		buf = append(buf, "COPY src /root/chaincode")
+		buf = append(buf, "RUN  cd /root/chaincode && "+buildCmd)
+		buf = append(buf, "RUN  cp /root/chaincode/build/chaincode.jar /root")
 	}
+
 	dockerFileContents = strings.Join(buf, "\n")
-
 	dockerFileSize := int64(len([]byte(dockerFileContents)))
-
+	fmt.Println(dockerFileContents)
 	//Make headers identical by using zero time
 	var zeroTime time.Time
 	tw.WriteHeader(&tar.Header{Name: "Dockerfile", Size: dockerFileSize, ModTime: zeroTime, AccessTime: zeroTime, ChangeTime: zeroTime})

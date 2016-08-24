@@ -19,6 +19,8 @@
 set -e
 PARENTDIR=$(pwd)	
 
-
+gradle -q -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle copyProtos
 gradle -q -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle clean
 gradle -q -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle build
+gradle -q -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle publishToMavenLocal
+cp -r ${PARENTDIR}/core/chaincode/shim/java/build/libs /root/
