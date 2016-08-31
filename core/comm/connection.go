@@ -43,7 +43,7 @@ func InitTLSForPeer() credentials.TransportAuthenticator {
 	var creds credentials.TransportAuthenticator
 	if viper.GetString("peer.tls.cert.file") != "" {
 		var err error
-		creds, err = credentials.NewClientTLSFromFile(viper.GetString("peer.tls.cert.file"), sn)
+		creds, err = credentials.NewClientTLSFromFile(viper.GetString("peer.tls.ca.file"), sn)
 		if err != nil {
 			grpclog.Fatalf("Failed to create TLS credentials %v", err)
 		}

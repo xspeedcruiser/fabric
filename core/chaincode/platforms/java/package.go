@@ -86,13 +86,13 @@ func writeChaincodePackage(spec *pb.ChaincodeSpec, tw *tar.Writer) error {
 	var dockerFileContents string
 	var buf []string
 
-	if viper.GetBool("security.enabled") {
-		//todo
-	} else {
-		buf = append(buf, cutil.GetDockerfileFromConfig("chaincode.java.Dockerfile"))
-		buf = append(buf, "COPY src /root/chaincode")
-		buf = append(buf, "RUN  cd /root/chaincode && "+buildCmd)
-		buf = append(buf, "RUN  cp /root/chaincode/build/chaincode.jar /root")
+	buf = append(buf, cutil.GetDockerfileFromConfig("chaincode.java.Dockerfile"))
+	buf = append(buf, "COPY src /root/chaincode")
+	buf = append(buf, "RUN  cd /root/chaincode && "+buildCmd)
+	buf = append(buf, "RUN  cp /root/chaincode/build/chaincode.jar /root")
+
+	if viper.GetBool("peer.tls.enabled") && viper.GetString("peer.tls.ca.file") != "" {
+		buf = append(buf, "COPY src/certs/ca.pem /root/certs/ca.pem")
 	}
 
 	dockerFileContents = strings.Join(buf, "\n")

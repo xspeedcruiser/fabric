@@ -302,9 +302,14 @@ func (chaincodeSupport *ChaincodeSupport) getArgsAndEnv(cID *pb.ChaincodeID, cLa
 				chaincodeSupport.peerAddress, cID.Name),
 			" ")
 		if chaincodeSupport.peerTLS {
-			args = append(args, " -s")
+			args = append(args, "-s")
+			if chaincodeSupport.peerTLSSvrHostOrd != "" {
+				args = append(args, "-o")
+				args = append(args, chaincodeSupport.peerTLSSvrHostOrd)
+			}
 		}
 		chaincodeLogger.Debugf("Executable is %s", args[0])
+		chaincodeLogger.Debugf("Args %v", args)
 	default:
 		return nil, nil, fmt.Errorf("Unknown chaincodeType: %s", cLang)
 	}
