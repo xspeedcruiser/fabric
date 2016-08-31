@@ -5,9 +5,10 @@ vp0:
   environment:
     - CORE_PEER_ID=vp0
     - CORE_PEER_TLS_ENABLED=true
-    - CORE_PEER_TLS_SERVERHOSTOVERRIDE=OBC
-    - CORE_PEER_TLS_CERT_FILE=./bddtests/tlsca.cert
-    - CORE_PEER_TLS_KEY_FILE=./bddtests/tlsca.priv
+    - CORE_PEER_TLS_SERVERHOSTOVERRIDE=dummy
+    - CORE_PEER_TLS_CERT_FILE=./bddtest/tlsca.cert
+    - CORE_PEER_TLS_KEY_FILE=./bddtest/tlsca.priv
+    - CORE_PEER_TLS_CA_FILE=./bddtest/rootcert.pem
 
 vp1:
   extends:
