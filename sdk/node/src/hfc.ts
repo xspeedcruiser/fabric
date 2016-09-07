@@ -552,6 +552,11 @@ export class Chain {
 
     /**
      * Set the deploy wait time in seconds.
+     * Node.js will automatically enforce a
+     * minimum and maximum wait time.  If the
+     * number of seconds is larger than 2147483,
+     * less than 1, or not a number,
+     * the actual wait time used will be 1 ms.
      * @param secs
      */
     setDeployWaitTime(secs:number):void {
@@ -603,7 +608,8 @@ export class Chain {
     }
 
     /**
-     * Get the user member named 'name'.
+     * Get the user member named 'name' or create
+     * a new member if the member does not exist.
      * @param cb Callback of form "function(err,Member)"
      */
     getMember(name:string, cb:GetMemberCallback):void {
@@ -627,7 +633,11 @@ export class Chain {
     }
 
     // Try to get the member from cache.
-    // If not found, create a new one, restore the state if found, and then store in cache.
+    // If not found, create a new one.
+    // If member is found in the key value store,
+    //    restore the state to the new member, store in cache and return the member.
+    // If there are no errors and member is not found in the key value store,
+    //    return the new member.
     private getMemberHelper(name:string, cb:GetMemberCallback) {
         let self = this;
         // Try to get the member state from the cache
@@ -637,6 +647,7 @@ export class Chain {
         member = new Member(name, self);
         member.restoreState(function (err) {
             if (err) return cb(err);
+            self.members[name]=member;
             cb(null, member);
         });
     }
@@ -2039,9 +2050,13 @@ export class Peer {
     private peerClient:any;
 
     /**
-     * Constructor for a peer given the endpoint config for the peer.
-     * @param {string} url The URL of
-     * @param {Chain} The chain of which this peer is a member.
+     * Constructs a Peer given its endpoint configuration settings
+     * and returns the new Peer.
+     * @param {string} url The URL with format of "grpcs://host:port".
+     * @param {Chain} chain The chain of which this peer is a member.
+     * @param {string} pem The certificate file, in PEM format,
+     * to use with the gRPC protocol (that is, with TransportCredentials).
+     * Required when using the grpcs protocol.
      * @returns {Peer} The new peer.
      */
     constructor(url:string, chain:Chain, pem:string) {
@@ -2196,15 +2211,24 @@ class Endpoint {
 
     constructor(url:string, pem?:string) {
         let purl = parseUrl(url);
-        let protocol = purl.protocol.toLowerCase();
+        var protocol;
+        if (purl.protocol) {
+            protocol = purl.protocol.toLowerCase().slice(0,-1);
+        }
         if (protocol === 'grpc') {
             this.addr = purl.host;
             this.creds = grpc.credentials.createInsecure();
-        } else if (protocol === 'grpcs') {
+        }
+        else if (protocol === 'grpcs') {
             this.addr = purl.host;
             this.creds = grpc.credentials.createSsl(new Buffer(pem));
-        } else {
-            throw Error("invalid protocol: " + protocol);
+        }
+        else {
+            var error = new Error();
+            error.name = "InvalidProtocol";
+            error.message = "Invalid protocol: " + protocol +
+                ".  URLs must begin with grpc:// or grpcs://"
+            throw error;
         }
     }
 }
@@ -2619,10 +2643,6 @@ function isFunction(fcn:any):boolean {
 function parseUrl(url:string):any {
     // TODO: find ambient definition for url
     var purl = urlParser.parse(url, true);
-    var protocol = purl.protocol;
-    if (endsWith(protocol, ":")) {
-        purl.protocol = protocol.slice(0, -1);
-    }
     return purl;
 }
 
@@ -2683,7 +2703,7 @@ export function newChain(name) {
 export function getChain(chainName, create) {
     let chain = _chains[chainName];
     if (!chain && create) {
-        chain = newChain(name);
+        chain = newChain(chainName);
     }
     return chain;
 }

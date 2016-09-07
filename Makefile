@@ -53,7 +53,7 @@ PKGNAME = github.com/$(PROJECT_NAME)
 GO_LDFLAGS = -X github.com/hyperledger/fabric/metadata.Version=$(PROJECT_VERSION)
 CGO_FLAGS = CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy"
 UID = $(shell id -u)
-CHAINTOOL_RELEASE=v0.8.1
+CHAINTOOL_RELEASE=v0.9.0
 
 EXECUTABLES = go docker git curl
 K := $(foreach exec,$(EXECUTABLES),\
@@ -70,7 +70,6 @@ BASEIMAGE_DEPS    = $(shell git ls-files images/base scripts/provision)
 JAVASHIM_DEPS =  $(shell git ls-files core/chaincode/shim/java)
 PROJECT_FILES = $(shell git ls-files)
 IMAGES = base src ccenv peer membersrvc javaenv
-
 
 all: peer membersrvc checks
 
@@ -90,6 +89,13 @@ membersrvc-image: build/image/membersrvc/.dummy
 
 unit-test: peer-image gotools
 	@./scripts/goUnitTests.sh $(DOCKER_TAG) "$(GO_LDFLAGS)"
+
+node-sdk: sdk/node
+
+node-sdk-unit-tests: peer membersrvc
+	cd sdk/node && $(MAKE) unit-tests
+
+unit-tests: unit-test node-sdk-unit-tests
 
 .PHONY: images
 images: $(patsubst %,build/image/%/.dummy, $(IMAGES))
@@ -246,11 +252,6 @@ src-image-clean: ccenv-image-clean peer-image-clean membersrvc-image-clean
 	-@rm -rf build/image/$(TARGET) ||:
 
 images-clean: $(patsubst %,%-image-clean, $(IMAGES))
-
-node-sdk: sdk/node
-
-node-sdk-unit-tests: peer membersrvc
-	cd sdk/node && $(MAKE) unit-tests
 
 .PHONY: $(SUBDIRS:=-clean)
 $(SUBDIRS:=-clean):
